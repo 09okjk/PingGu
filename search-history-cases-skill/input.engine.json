@@ -1,0 +1,9 @@
+{
+  "business_type": "轮机",
+  "service_desc_code": "RS0000000001",
+  "service_type_code": null,
+  "equipment_model_code": null,
+  "task_description": "主机健康检查,LDM",
+  "remark": "动火作业报备，关注施工安全和工期影响因素",
+  "top_k": 5
+}

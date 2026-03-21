@@ -1,0 +1,9 @@
+{
+  "business_type": "轮机",
+  "service_desc_code": "RS0000000001",
+  "service_type_code": "CS0017",
+  "equipment_model_code": "ET000000000826",
+  "task_description": "主机常规坞修保养工作",
+  "remark": "工期因交叉作业、备件、船厂进出坞等因素可能延迟",
+  "top_k": 5
+}

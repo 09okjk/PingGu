@@ -1,0 +1,9 @@
+{
+  "business_type": "电气",
+  "service_desc_code": "RS0000000001",
+  "service_type_code": "CS0006",
+  "equipment_model_code": null,
+  "task_description": "ICCP接地装置换新",
+  "remark": "需配合船厂施工窗口，避免交叉作业冲突",
+  "top_k": 5
+}

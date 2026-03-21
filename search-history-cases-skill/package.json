@@ -1,0 +1,16 @@
+{
+  "name": "search-history-cases-skill",
+  "version": "1.0.0",
+  "description": "S1 SearchHistoryCasesSkill for OpenClaw/OpenCode-like frameworks",
+  "type": "module",
+  "main": "scripts/main.mjs",
+  "scripts": {
+    "search": "node ./scripts/main.mjs --input ./input.json --pretty",
+    "search:engine": "node ./scripts/main.mjs --input ./input.engine.json --pretty",
+    "search:electrical": "node ./scripts/main.mjs --input ./input.electrical.json --pretty"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "pg": "^8.12.0"
+  }
+}

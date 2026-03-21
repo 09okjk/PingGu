@@ -1,0 +1,8 @@
+{
+  "name": "SearchHistoryCasesSkill",
+  "slug": "search-history-cases-skill",
+  "version": "1.0.0",
+  "author": "09okjk",
+  "license": "MIT",
+  "tags": ["agent-skill", "search", "postgresql", "pg_trgm", "openclaw"]
+}
