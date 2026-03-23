@@ -19,8 +19,11 @@ PingGu/
 │   ├── parse-requirement-skill/    # S5: 需求解析 Skill
 │   └── search-history-cases-skill/ # S1: 历史案例检索 Skill
 ├── AGENTS.md                  # 本文件
-├── OpenClawSkill 创建规范.md   # Skill 开发规范
-└── *.md                       # 设计文档
+└── 设计方案及规范/             # 设计文档和规范
+    ├── OpenClawSkill 创建规范.md
+    ├── S5 - ParseRequirementSkill 详细设计.md
+    ├── S1 - SearchHistoryCasesSkill 详细设计.md
+    └── 智能评估 Agent Skill 规划方案.md
 ```
 
 ## 构建与运行命令
@@ -136,7 +139,7 @@ try {
 
 ## Skill 开发规范
 
-参考 `OpenClawSkill 创建规范.md`，核心要求：
+参考 `设计方案及规范/OpenClawSkill 创建规范.md`，核心要求：
 
 1. **SKILL.md 必需**: 包含 frontmatter 和完整文档
 2. **name 格式**: 小写连字符 (如 `parse-requirement-skill`)
@@ -184,8 +187,9 @@ S6 GenerateReportSkill (生成报告)
 
 ## 相关文档
 
-- `智能评估 Agent Skill 规划方案.md` - 整体架构设计
-- `S5 - ParseRequirementSkill 详细设计.md` - 需求解析 Skill 详解
+- `设计方案及规范/智能评估 Agent Skill 规划方案.md` - 整体架构设计
+- `设计方案及规范/S5 - ParseRequirementSkill 详细设计.md` - 需求解析 Skill 详解
+- `设计方案及规范/S1 - SearchHistoryCasesSkill 详细设计.md` - 历史案例检索 Skill 详解
 - `.opencode/skills/*/SKILL.md` - 各 Skill 使用文档
 
 ## 注意事项
