@@ -688,7 +688,7 @@ Step 5：写入数据库
   ├── business_type        （必填）
   ├── service_desc_code    （必填）
   ├── service_type_code    （可 NULL）
-  ├─�� equipment_model_code （可 NULL）
+  ├── equipment_model_code （可 NULL）
   ├── task_description     （可 NULL，用于 trgm 排序）
   ├── remark               （可 NULL，仅供备注相似度补充）
   └── top_k                （默认 5，上层 Agent 可动态配置）
