@@ -1,0 +1,23 @@
+{
+  "service_desc": {
+    "main engine service": "主机服务",
+    "boiler service": "锅炉服务",
+    "generator service": "发电机服务"
+  },
+  "service_type": {
+    "inspect": "检测",
+    "inspection": "检测",
+    "repair": "维修",
+    "replace": "更换",
+    "maintenance": "保养"
+  },
+  "business_type": {
+    "mechanical": "轮机",
+    "electrical": "电气"
+  },
+  "equipment_name": {
+    "main engine": "主机",
+    "boiler": "锅炉",
+    "generator": "发电机"
+  }
+}

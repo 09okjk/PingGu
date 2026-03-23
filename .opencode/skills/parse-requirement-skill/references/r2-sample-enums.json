@@ -1,0 +1,138 @@
+{
+  "service_desc_enum": [
+    {
+      "code": "SD001",
+      "name": "主机",
+      "aliases": ["main engine", "m/e", "engine", "主机", "主机设备"]
+    },
+    {
+      "code": "SD002",
+      "name": "锅炉",
+      "aliases": ["boiler", "auxiliary boiler", "锅炉"]
+    },
+    {
+      "code": "SD003",
+      "name": "阀",
+      "aliases": ["valve", "阀", "主机阀"]
+    },
+    {
+      "code": "SD004",
+      "name": "燃油系统",
+      "aliases": ["fuel system", "fuel pipe", "燃油系统", "燃油管路"]
+    },
+    {
+      "code": "SD005",
+      "name": "电气系统",
+      "aliases": ["electrical system", "electrical", "电气系统", "控制系统"]
+    }
+  ],
+  "service_type_enum": [
+    {
+      "code": "ST001",
+      "name": "检测",
+      "aliases": ["inspection", "inspect", "check", "checking", "diagnosis", "检测", "检查", "诊断"]
+    },
+    {
+      "code": "ST002",
+      "name": "维修",
+      "aliases": ["repair", "fix", "troubleshooting", "维修", "修理", "排故"]
+    },
+    {
+      "code": "ST003",
+      "name": "更换",
+      "aliases": ["replace", "replacement", "renew", "renewal", "更换", "换新"]
+    },
+    {
+      "code": "ST004",
+      "name": "安装",
+      "aliases": ["install", "installation", "安装"]
+    },
+    {
+      "code": "ST005",
+      "name": "保养",
+      "aliases": ["maintenance", "overhaul", "service", "保养", "检修", "坞修保养"]
+    }
+  ],
+  "business_type_enum": [
+    {
+      "code": "BT001",
+      "name": "轮机",
+      "aliases": ["轮机", "machinery", "engine", "main engine", "boiler"]
+    },
+    {
+      "code": "BT002",
+      "name": "电气",
+      "aliases": ["电气", "electrical", "control", "automation"]
+    }
+  ],
+  "equipment_name_enum": [
+    {
+      "code": "EQ001",
+      "name": "主机",
+      "aliases": ["main engine", "m/e", "主机"]
+    },
+    {
+      "code": "EQ002",
+      "name": "锅炉",
+      "aliases": ["boiler", "锅炉"]
+    },
+    {
+      "code": "EQ003",
+      "name": "阀",
+      "aliases": ["valve", "阀"]
+    },
+    {
+      "code": "EQ004",
+      "name": "燃油系统",
+      "aliases": ["fuel system", "fuel pipe", "燃油系统", "燃油管路"]
+    },
+    {
+      "code": "EQ005",
+      "name": "电气系统",
+      "aliases": ["electrical system", "electrical", "控制系统", "电气系统"]
+    }
+  ],
+  "unit_enum": [
+    {
+      "code": "UM0005",
+      "name": "台",
+      "aliases": ["unit", "units", "set", "sets", "台"]
+    },
+    {
+      "code": "UM0001",
+      "name": "个",
+      "aliases": ["piece", "pieces", "pc", "pcs", "个"]
+    },
+    {
+      "code": "UM0010",
+      "name": "套",
+      "aliases": ["set", "sets", "套"]
+    }
+  ],
+  "business_type_inference": {
+    "SD001": "BT001",
+    "SD002": "BT001",
+    "SD003": "BT001",
+    "SD004": "BT001",
+    "SD005": "BT002",
+    "EQ001": "BT001",
+    "EQ002": "BT001",
+    "EQ003": "BT001",
+    "EQ004": "BT001",
+    "EQ005": "BT002"
+  },
+  "model_patterns": [
+    "[0-9]{1,2}[A-Z][0-9]{2}[A-Z]{1,3}(?:-[A-Z0-9\\.]+)?",
+    "MAN\\s*B&W-[0-9A-Z\\-\\.]+"
+  ],
+  "split_keywords": [
+    "also",
+    "and also",
+    "in addition",
+    "另外",
+    "此外",
+    "同时",
+    "另一个",
+    "另外一个"
+  ]
+}

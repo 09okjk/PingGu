@@ -1,0 +1,41 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "requirement-input.schema.json",
+  "title": "ParseRequirementSkill Input",
+  "type": "object",
+  "required": ["email_text"],
+  "properties": {
+    "email_text": {
+      "type": "string",
+      "description": "原始邮件正文或自然语言需求文本"
+    },
+    "attachments": {
+      "type": "array",
+      "description": "附件预留字段，当前阶段不处理，仅保留扩展性",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": { "type": "string" },
+          "mime_type": { "type": "string" },
+          "uri": { "type": "string" }
+        },
+        "required": ["name"]
+      },
+      "default": []
+    },
+    "language_hint": {
+      "type": ["string", "null"],
+      "description": "可选语言提示，如 en/zh/ja/ko"
+    },
+    "strict": {
+      "type": "boolean",
+      "default": false
+    },
+    "metadata": {
+      "type": "object",
+      "description": "可选调用元信息",
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": true
+}

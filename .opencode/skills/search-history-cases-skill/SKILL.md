@@ -1,11 +1,6 @@
 ---
-name: SearchHistoryCasesSkill
-slug: search-history-cases-skill
-version: 1.0.0
-homepage: https://github.com/09okjk/PingGu
-description: 根据服务需求单在历史评估库中执行渐进式检索并返回Top-K相似案例
-changelog: |
-  - 1.0.0: 首版实现，支持PostgreSQL+pg_trgm、候选不足自动放宽、人员明细拉取、备注相似度补充
+name: search-history-cases-skill
+description: 根据服务需求单在历史评估库中执行渐进式检索并返回 Top-K 相似案例
 metadata:
   clawdbot:
     emoji: 🔎
@@ -36,7 +31,7 @@ metadata:
 
 ## Setup（安装配置）
 
-1. 安装依��
+1. 安装依赖
 2. 配置环境变量
 3. 初始化数据库扩展和索引（可选）
 4. 执行检索命令

@@ -1,0 +1,10 @@
+{
+  "email_text": "Dear team,\n\nWe have an issue with our main engine and boiler.\n\nThe main engine shows abnormal vibration and may need inspection. The model is 5S50ME-B and quantity is 1 unit.\n\nAlso, the boiler has leakage and may require repair.\n\nPlease advise the service scope and estimated manpower.\n",
+  "attachments": [],
+  "language_hint": "en",
+  "strict": false,
+  "metadata": {
+    "source": "local_test",
+    "request_id": "demo-001"
+  }
+}

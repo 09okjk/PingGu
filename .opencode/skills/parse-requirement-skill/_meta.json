@@ -1,0 +1,8 @@
+{
+  "name": "ParseRequirementSkill",
+  "slug": "parse-requirement-skill",
+  "version": "1.0.0",
+  "author": "09okjk",
+  "description": "Parse natural-language service request emails into structured requirement items.",
+  "entry": "scripts/main.py"
+}
