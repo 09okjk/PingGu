@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "requirement-revise-input.schema.json",
+  "title": "ParseRequirementSkill Revise Input",
+  "type": "object",
+  "required": ["session_id", "current_requirements", "user_feedback"],
+  "properties": {
+    "session_id": {
+      "type": "string"
+    },
+    "current_requirements": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
+    },
+    "user_feedback": {
+      "type": "string"
+    },
+    "revision_history": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      },
+      "default": []
+    },
+    "metadata": {
+      "type": "object",
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": true
+}

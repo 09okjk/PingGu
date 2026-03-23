@@ -1,57 +1,82 @@
-# ParseRequirementSkill
+# ParseRequirementSkill v2
 
-用于将自然语言邮件解析为标准化服务需求项列表的 Skill。
+支持三阶段交互闭环的需求解析 Skill：
 
-## 功能特性
+- `parse`：把邮件解析成需求单草稿
+- `revise`：吸收用户反馈并更新需求单
+- `confirm`：最终确认，停止继续追问
 
-- 支持从一封邮件中拆分多个服务项
-- 支持服务描述 / 服务类型 / 设备对象 / 数量 / 单位提取
-- 支持枚举映射与别名匹配
-- 支持歧义输出和待确认标记
-- 当前不依赖外部模型，适合本地快速测试
-- 后续可无缝扩展附件解析与 LLM 增强
+## 目录结构
 
-## 快速开始
+```text
+parse-requirement-skill/
+├── SKILL.md
+├── README.md
+├── _meta.json
+├── .env.example
+├── .gitignore
+├── scripts/
+│   └── main.py
+├── references/
+│   ├── config.md
+│   ├── r2-sample-enums.json
+│   ├── aliases.json
+│   └── *.schema.json
+└── samples/
+    └── *.json
+```
 
-### 直接输入文本
+## 快速测试
 
+### 1. parse
 ```bash
 python3 scripts/main.py \
-  --input "The main engine shows abnormal vibration and may need inspection. The boiler has leakage and may require repair." \
+  --action parse \
+  --json-input-file samples/sample-input.json \
   --refs references/r2-sample-enums.json \
   --pretty
 ```
 
-### 从文件读取
-
+### 2. revise
 ```bash
 python3 scripts/main.py \
-  --input-file sample-email.txt \
+  --action revise \
+  --json-input-file samples/sample-revise-input.json \
   --refs references/r2-sample-enums.json \
   --pretty
 ```
 
-## 输出说明
+### 3. confirm
+```bash
+python3 scripts/main.py \
+  --action confirm \
+  --json-input-file samples/sample-confirm-input.json \
+  --refs references/r2-sample-enums.json \
+  --pretty
+```
 
-顶层返回：
-- `success`
-- `data`
-- `error`
+## 交互闭环思路
 
-`data.requirements` 是解析后的服务项数组，可直接给下游 Skill 使用。
+1. 用户提交原始邮件
+2. Skill 初始解析生成需求项草稿
+3. 用户提出修改意见
+4. Skill 更新需求项并继续提问
+5. 用户确认无需再修改
+6. Skill 输出 `confirmed` 状态
+7. 进入后续 S1/S2/S6
 
-## 注意事项
+## 当前版本特点
 
-1. 当前版本为 MVP，本地规则优先。
-2. 若未命中正式枚举，可能输出 `null` 或低置信度候选。
-3. 获取正式 R2 数据后，请替换参考文件中的示例枚举。
-4. 当前未启用附件解析，但输入结构已预留扩展位。
+- 规则优先
+- 本地可跑
+- 支持 session / revision history
+- 支持 next_questions
+- 保留未来接入 LLM 的扩展位
 
-## 推荐测试点
+## 后续建议
 
-- 单设备单问题
-- 多设备多问题
-- 中英混合输入
-- 含型号但无明确服务类型
-- 含数量单位
-- 描述模糊、需要歧义输出的邮件
+- 接入正式 R2 枚举
+- 丰富 alias 映射
+- 增加字段级精细修订
+- 增加会话持久化
+- 增加离线飞轮学习

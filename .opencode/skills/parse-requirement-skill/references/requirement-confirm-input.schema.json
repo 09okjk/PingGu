@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "requirement-confirm-input.schema.json",
+  "title": "ParseRequirementSkill Confirm Input",
+  "type": "object",
+  "required": ["session_id", "current_requirements"],
+  "properties": {
+    "session_id": {
+      "type": "string"
+    },
+    "current_requirements": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
+    },
+    "user_feedback": {
+      "type": ["string", "null"]
+    },
+    "revision_history": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      },
+      "default": []
+    },
+    "metadata": {
+      "type": "object",
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": true
+}

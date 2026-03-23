@@ -1,8 +1,8 @@
 {
-  "name": "ParseRequirementSkill",
+  "name": "parse-requirement-skill",
   "slug": "parse-requirement-skill",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "author": "09okjk",
-  "description": "Parse natural-language service request emails into structured requirement items.",
+  "description": "Parse natural-language service request emails into structured requirement items with interactive confirmation loop.",
   "entry": "scripts/main.py"
 }

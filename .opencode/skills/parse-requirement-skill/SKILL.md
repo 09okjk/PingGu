@@ -1,6 +1,16 @@
 ---
 name: parse-requirement-skill
-description: 将自然语言邮件解析为一个或多个标准化服务需求项，输出结构化字段、证据片段、歧义项与置信度，供后续历史检索与评估流程使用。
+slug: parse-requirement-skill
+version: 2.0.0
+description: 将自然语言邮件解析为一个或多个标准化服务需求项，并通过 parse / revise / confirm 三阶段交互闭环完成需求确认。
+changelog: |
+  ## [2.0.0] - 交互闭环版
+  - 新增 parse / revise / confirm 三阶段支持
+  - 新增 session_id 和 revision_history 支持
+  - 新增 next_questions 自动生成
+  - 支持多服务项拆分
+  ## [1.0.0] - 初始版本
+  - 基础解析功能
 metadata:
   clawdbot:
     emoji: 🧩
@@ -12,182 +22,181 @@ metadata:
 
 # ParseRequirementSkill
 
-将用户输入的原始自然语言邮件解析为 1~N 个结构化服务需求项（RequirementItem），支持：
-- 多服务项拆分
-- 服务描述/服务类型/业务归口/设备信息抽取
-- 枚举映射
-- 证据保留
-- 歧义标注
-- 统一 JSON 输出
+这是一个面向智能评估 Agent 的前置 Skill，用于把用户原始自然语言邮件解析、拆分并逐步确认成标准化需求单。
+
+支持三个阶段：
+
+- `parse`：初始解析，输出需求项草稿
+- `revise`：根据用户反馈修改草稿
+- `confirm`：确认最终需求单，结束交互
 
 ---
 
 ## When to Use
 
-✅ 适用于以下场景：
+✅ 适用于：
 
-- 用户输入是自然语言邮件或描述，而不是标准表单
-- 一段原始需求中可能包含多个服务项
-- 需要在进入历史案例检索前，先完成结构化解析
-- 需要把自然语言表达映射到标准枚举体系
-- 需要输出可供下游 Skill 直接消费的 JSON
-
-典型示例：
-- “主机有异常振动，锅炉有泄漏，想咨询检查和维修方案”
-- “Need inspection for main engine and possible repair for boiler”
-- “客户邮件中提到了多个设备问题，需要拆成多个需求单”
+- 输入是自然语言邮件，而不是标准表单
+- 一封邮件可能包含多个服务项
+- 需要在进入历史案例检索前先标准化输入
+- 需要通过交互确认逐步修正需求单
+- 希望记录用户修订轨迹，为后续飞轮优化提供数据
 
 ---
 
 ## When NOT to Use
 
-❌ 不适用于以下场景：
+❌ 不适用于：
 
-- 输入已经是标准化、字段齐全的需求单
-- 仅需对已结构化字段执行历史检索
-- 只做单纯翻译，不做需求拆分和字段映射
-- 只做风险匹配或工时估算
+- 输入已经是标准化且已确认的需求单
+- 只做历史检索，不做需求解析
+- 只做文本翻译
+- 只做最终报告生成
 
 ---
 
 ## Setup
 
-1. 准备目录结构：
-   - `scripts/main.py`
-   - `references/r2-sample-enums.json`
-
-2. 可选：复制环境变量模板
-```bash
-cp .env.example .env
-```
-
-3. 直接运行脚本测试：
 ```bash
 python3 {baseDir}/scripts/main.py \
-  --input "The main engine shows abnormal vibration and may need inspection. The boiler has leakage and may require repair." \
-  --refs "{baseDir}/references/r2-sample-enums.json"
+  --action parse \
+  --json-input-file "{baseDir}/samples/sample-input.json" \
+  --refs "{baseDir}/references/r2-sample-enums.json" \
+  --pretty
 ```
 
-4. 或从文件读取输入：
+修订：
 ```bash
 python3 {baseDir}/scripts/main.py \
-  --input-file "{baseDir}/sample-email.txt" \
-  --refs "{baseDir}/references/r2-sample-enums.json"
+  --action revise \
+  --json-input-file "{baseDir}/samples/sample-revise-input.json" \
+  --refs "{baseDir}/references/r2-sample-enums.json" \
+  --pretty
+```
+
+确认：
+```bash
+python3 {baseDir}/scripts/main.py \
+  --action confirm \
+  --json-input-file "{baseDir}/samples/sample-confirm-input.json" \
+  --refs "{baseDir}/references/r2-sample-enums.json" \
+  --pretty
 ```
 
 ---
 
 ## Options
 
-- `--input <text>`: 直接传入原始邮件文本
-- `--input-file <path>`: 从文件读取邮件文本
-- `--refs <path>`: R2 枚举/别名参考文件路径
-- `--pretty`: 以格式化 JSON 输出
-- `--strict`: 开启严格模式；未命中关键枚举时提高待确认标记
-- `--lang <code>`: 手动指定输入语言（如 `en` / `zh`），默认自动粗识别
+### 通用选项
 
----
+| 选项 | 说明 | parse | revise | confirm |
+|------|------|-------|--------|---------|
+| `--action` | 指定执行阶段 | ✅ | ✅ | ✅ |
+| `--refs` | R2 参考文件路径 | ✅ | ✅ | ✅ |
+| `--pretty` | 格式化输出 JSON | ✅ | ✅ | ✅ |
+| `--lang` | 强制指定语言 | ✅ | ❌ | ❌ |
+| `--strict` | 严格模式 | ✅ | ❌ | ❌ |
 
-## Input Contract
+### 输入选项（互斥）
 
-输入为自然语言邮件文本，附件字段预留但当前不启用。
+| 选项 | 说明 | parse | revise | confirm |
+|------|------|-------|--------|---------|
+| `--input` | 原始文本输入 | ✅ | ❌ | ❌ |
+| `--input-file` | 从文件读取原始文本 | ✅ | ❌ | ❌ |
+| `--json-input` | 直接传 JSON 输入 | ✅ | ✅ | ✅ |
+| `--json-input-file` | 从文件读取 JSON 输入 | ✅ | ✅ | ✅ |
 
-脚本标准输入逻辑：
-- 优先使用 `--input`
-- 其次使用 `--input-file`
-- 若都未提供，则从 STDIN 读取
+### 各阶段推荐用法
 
-参考枚举文件必须是 JSON，包含至少：
-- 服务描述枚举
-- 服务类型枚举
-- 业务归口枚举
-- 设备名称枚举
-- 单位枚举
-- 别名映射
+**parse 阶段**（4 种方式）:
+```bash
+# 方式 1: 命令行直接输入
+python3 scripts/main.py --action parse --input "邮件文本" --refs references/r2-sample-enums.json
 
----
+# 方式 2: 从文件读取文本
+python3 scripts/main.py --action parse --input-file sample-email.txt --refs references/r2-sample-enums.json
 
-## Output Contract
+# 方式 3: JSON payload（命令行）
+python3 scripts/main.py --action parse --json-input '{"email_text": "..."}' --refs references/r2-sample-enums.json
 
-脚本输出统一 JSON，结构如下：
-
-```json
-{
-  "success": true,
-  "data": {
-    "input_type": "email_text",
-    "language": "en",
-    "requirement_count": 2,
-    "requirements": [],
-    "global_ambiguities": [],
-    "parsing_notes": []
-  },
-  "error": null
-}
+# 方式 4: JSON payload（文件）
+python3 scripts/main.py --action parse --json-input-file samples/sample-input.json --refs references/r2-sample-enums.json
 ```
 
-要求：
-- stdout 仅输出 JSON
-- stderr 可输出调试日志
-- 失败时返回：
-```json
-{
-  "success": false,
-  "data": null,
-  "error": {
-    "code": "PARSE_ERROR",
-    "message": "..."
-  }
-}
+**revise/confirm 阶段**（2 种方式，必须使用 JSON）:
+```bash
+# 方式 1: JSON payload（命令行）
+python3 scripts/main.py --action revise --json-input '{"session_id": "...", ...}' --refs references/r2-sample-enums.json
+
+# 方式 2: JSON payload（文件）
+python3 scripts/main.py --action revise --json-input-file samples/sample-revise-input.json --refs references/r2-sample-enums.json
 ```
 
 ---
 
 ## Core Rules
 
-1. **不得臆造**
-   - 邮件中没有明确或高概率推断的信息，不得虚构。
-   - 无法判断时输出 `null` 或候选歧义项。
+1. 不得臆造用户未提供的信息
+2. 必须支持一封邮件拆分多个服务项
+3. 每个需求项必须保留原文证据
+4. 允许字段为空，允许输出歧义候选
+5. 若用户尚未确认，应继续输出 `next_questions`
+6. 只有 `confirm` 阶段明确确认后，状态才变为 `confirmed`
+7. 所有用户修订应被记录在 `revision_history` 中
+8. 当前版本不解析附件内容，但保留 `attachments` 扩展位
 
-2. **必须支持多服务项拆分**
-   - 一封邮件可能对应多个需求单。
-   - 若识别到多个设备对象或多个独立服务诉求，应拆分为多个 RequirementItem。
+---
 
-3. **必须保留原文证据**
-   - 每个 RequirementItem 都应保留 `original_evidence`。
+## Output Contract
 
-4. **规则优先**
-   - 优先通过别名词典、关键词规则、枚举映射完成解析。
-   - 允许后续接入 LLM，但不依赖单独 Skill 模型配置。
+统一输出：
 
-5. **允许字段为空**
-   - `service_type`、`equipment_model`、`business_type` 等都允许为 `null`。
+```json
+{
+  "success": true,
+  "data": {
+    "session_id": "xxx",
+    "status": "needs_confirmation",
+    "action": "parse",
+    "requirements": [],
+    "next_questions": [],
+    "revision_history": []
+  },
+  "error": null
+}
+```
 
-6. **兼容后续扩展**
-   - 预留 `attachments` 字段，但当前不处理附件内容。
-   - 预留 LLM 接口适配位置。
+状态包括：
+
+- `draft`
+- `needs_confirmation`
+- `confirmed`
 
 ---
 
 ## Security & Privacy
 
-- 默认仅处理本地传入文本，不主动联网。
-- 不上传附件、不外发原文。
-- 若后续接入 LLM，请由上层 Agent 统一管理模型调用与数据边界。
-- 建议在生产环境中对输入文本做脱敏审计。
+- 默认本地处理，不主动联网
+- 附件暂不解析
+- 建议生产环境中由上层 Agent 统一接管模型调用、日志与脱敏
+
+### 环境变量
+
+当前版本不强依赖环境变量，但预留以下配置：
+
+```bash
+# .env.example
+OPENAI_API_KEY=     # 接入 LLM 时使用
+MODEL_NAME=         # 指定模型名称
+LOG_LEVEL=INFO      # 日志级别
+```
+
+详见 `.env.example` 和 `references/config.md`。
 
 ---
 
 ## Related Skills
 
-- `SearchHistoryCasesSkill`：消费结构化需求项进行相似案例检索
-- `MatchRisksSkill`：基于解析结果进行风险匹配
-- `GenerateReportSkill`：汇总多 Skill 输出生成评估报告
-
----
-
-## Feedback
-
-- 首轮测试建议优先验证“多服务项拆分是否准确”
-- 第二轮验证“服务描述 / 服务类型 枚举映射是否稳定”
-- 获取正式 R2 枚举后，优先更新 `references/r2-sample-enums.json`
+- `SearchHistoryCasesSkill`
+- `MatchRisksSkill`
+- `GenerateReportSkill`

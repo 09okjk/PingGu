@@ -1,0 +1,90 @@
+{
+  "session_id": "sess-demo-001",
+  "current_requirements": [
+    {
+      "requirement_id": "REQ-001",
+      "summary": "主机 / 检测",
+      "business_type": {
+        "code": "BT001",
+        "name": "轮机",
+        "confidence": "medium"
+      },
+      "service_desc": {
+        "code": "SD001",
+        "name": "主机",
+        "confidence": "high"
+      },
+      "service_type": {
+        "code": "ST001",
+        "name": "检测",
+        "confidence": "medium"
+      },
+      "equipment_name": {
+        "code": "EQ001",
+        "name": "主机",
+        "confidence": "medium"
+      },
+      "equipment_model": {
+        "code": null,
+        "name": "5S50ME-B",
+        "confidence": "medium"
+      },
+      "equipment_manufacturer": null,
+      "equipment_quantity": 1.0,
+      "equipment_unit": {
+        "code": "UM0005",
+        "name": "台",
+        "confidence": "medium"
+      },
+      "service_device_models": ["5S50ME-B"],
+      "remark": "The main engine shows abnormal vibration and may need inspection. The model is 5S50ME-B and quantity is 1 unit.",
+      "original_evidence": [
+        "The main engine shows abnormal vibration and may need inspection. The model is 5S50ME-B and quantity is 1 unit."
+      ],
+      "ambiguities": [],
+      "confidence": "high",
+      "needs_user_confirmation": false
+    },
+    {
+      "requirement_id": "REQ-002",
+      "summary": "锅炉 / 维修",
+      "business_type": {
+        "code": "BT001",
+        "name": "轮机",
+        "confidence": "medium"
+      },
+      "service_desc": {
+        "code": "SD002",
+        "name": "锅炉",
+        "confidence": "high"
+      },
+      "service_type": {
+        "code": "ST002",
+        "name": "维修",
+        "confidence": "medium"
+      },
+      "equipment_name": {
+        "code": "EQ002",
+        "name": "锅炉",
+        "confidence": "medium"
+      },
+      "equipment_model": null,
+      "equipment_manufacturer": null,
+      "equipment_quantity": null,
+      "equipment_unit": null,
+      "service_device_models": [],
+      "remark": "Also, the boiler has leakage and may require repair.",
+      "original_evidence": [
+        "Also, the boiler has leakage and may require repair."
+      ],
+      "ambiguities": [],
+      "confidence": "high",
+      "needs_user_confirmation": false
+    }
+  ],
+  "user_feedback": "第二项不是维修，应该改成更换。",
+  "revision_history": [],
+  "metadata": {
+    "source": "local_test"
+  }
+}
