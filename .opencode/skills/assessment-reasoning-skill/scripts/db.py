@@ -2,8 +2,11 @@ import json
 import os
 from typing import Any, Dict, List, Optional
 
-from env_loader import get_bool_env, get_env
+from env_loader import get_bool_env, get_env, load_env_file
 from utils import load_json_file, refs_path
+
+# 加载 .env 文件中的环境变量
+load_env_file()
 
 
 class ReferenceRepository:
@@ -42,7 +45,9 @@ class ReferenceRepository:
         )
         return self._conn
 
-    def _fetch_all(self, sql: str, params: Optional[tuple] = None) -> List[Dict[str, Any]]:
+    def _fetch_all(
+        self, sql: str, params: Optional[tuple] = None
+    ) -> List[Dict[str, Any]]:
         conn = self._ensure_connection()
         if conn is None:
             return []
@@ -105,10 +110,18 @@ class ReferenceRepository:
                             "risk_level": row["risk_level"],
                             "description": row["description"],
                             "suggested_action": row["suggested_action"],
-                            "service_type_codes": self._parse_jsonish(row.get("service_type_codes"), []),
-                            "equipment_name_codes": self._parse_jsonish(row.get("equipment_name_codes"), []),
-                            "equipment_model_codes": self._parse_jsonish(row.get("equipment_model_codes"), []),
-                            "keyword_triggers": self._parse_jsonish(row.get("keyword_triggers"), []),
+                            "service_type_codes": self._parse_jsonish(
+                                row.get("service_type_codes"), []
+                            ),
+                            "equipment_name_codes": self._parse_jsonish(
+                                row.get("equipment_name_codes"), []
+                            ),
+                            "equipment_model_codes": self._parse_jsonish(
+                                row.get("equipment_model_codes"), []
+                            ),
+                            "keyword_triggers": self._parse_jsonish(
+                                row.get("keyword_triggers"), []
+                            ),
                             "is_active": bool(row.get("is_active", True)),
                         }
                     )
@@ -145,10 +158,18 @@ class ReferenceRepository:
                             "equipment_name_code": row["equipment_name_code"],
                             "task_tag": row["task_tag"],
                             "work_type_code": row["work_type_code"],
-                            "baseline_hours": float(row["baseline_hours"]) if row["baseline_hours"] is not None else 0,
-                            "quantity_factor": float(row["quantity_factor"]) if row["quantity_factor"] is not None else 0,
-                            "risk_adjustments": self._parse_jsonish(row.get("risk_adjustments"), []),
-                            "sample_size": int(row["sample_size"]) if row["sample_size"] is not None else 0,
+                            "baseline_hours": float(row["baseline_hours"])
+                            if row["baseline_hours"] is not None
+                            else 0,
+                            "quantity_factor": float(row["quantity_factor"])
+                            if row["quantity_factor"] is not None
+                            else 0,
+                            "risk_adjustments": self._parse_jsonish(
+                                row.get("risk_adjustments"), []
+                            ),
+                            "sample_size": int(row["sample_size"])
+                            if row["sample_size"] is not None
+                            else 0,
                             "is_active": bool(row.get("is_active", True)),
                         }
                     )
@@ -181,7 +202,10 @@ class ReferenceRepository:
                 global_rules: Dict[str, Any] = {}
                 for row in global_rows:
                     raw = row.get("rule_value")
-                    if isinstance(raw, str) and raw.strip().lower() in {"true", "false"}:
+                    if isinstance(raw, str) and raw.strip().lower() in {
+                        "true",
+                        "false",
+                    }:
                         global_rules[row["rule_key"]] = raw.strip().lower() == "true"
                     else:
                         global_rules[row["rule_key"]] = raw
