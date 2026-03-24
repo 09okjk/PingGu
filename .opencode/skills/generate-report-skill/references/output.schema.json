@@ -1,0 +1,15 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "GenerateReportSkillOutput",
+  "type": "object",
+  "required": ["success", "data", "error"],
+  "properties": {
+    "success": { "type": "boolean" },
+    "data": {
+      "type": ["object", "null"]
+    },
+    "error": {
+      "type": ["object", "null"]
+    }
+  }
+}

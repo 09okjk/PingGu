@@ -1,0 +1,263 @@
+{
+  "success": true,
+  "data": {
+    "requirement_id": "req-001",
+    "status": "ok",
+    "report_version": "1.1.0",
+    "report_language": "zh-CN",
+    "report_type": "service_assessment_draft",
+    "report_for": [
+      "engineering_review",
+      "quotation_preparation"
+    ],
+    "summary": {
+      "requirement_summary": "轮机 / 火警系统 / 维修 / 主机 / MAN B&W-9S90ME-C9.2-TII",
+      "business_type": {
+        "code": "BT001",
+        "name": "轮机"
+      },
+      "service_desc": {
+        "code": "RS0000001761",
+        "name": "火警系统"
+      },
+      "service_type": {
+        "code": "CS0001",
+        "name": "维修"
+      },
+      "service_location_type": {
+        "code": "SL001",
+        "name": "港口"
+      },
+      "equipment_name": {
+        "code": "EN0001",
+        "name": "主机"
+      },
+      "equipment_model": {
+        "code": "ET000826",
+        "name": "MAN B&W-9S90ME-C9.2-TII"
+      },
+      "equipment_quantity": 1,
+      "equipment_unit": {
+        "code": "UM0005",
+        "name": "台"
+      },
+      "remark_summary": "内含船厂常规工作，可能存在交叉作业与备件等待。设备/备件归属暂未明确。"
+    },
+    "report_table": {
+      "risk_rows": [
+        {
+          "risk_id": "RISK-001",
+          "risk_name": "船厂交叉作业导致工期延误",
+          "risk_level": "high",
+          "description": "现场存在交叉作业时，可能导致施工窗口受限与工期延误。",
+          "suggested_action": "建议预留工期缓冲，并提前确认现场作业窗口。",
+          "confidence": "high",
+          "source": [
+            "s2_risk:RISK-001",
+            "s2_risk_trigger:remark_keyword:交叉作业",
+            "s1_history_case:RH-2025-0009611001"
+          ]
+        }
+      ],
+      "task_rows": [
+        {
+          "task_id": "task-001",
+          "task_name": "主机常规坞修保养工作",
+          "task_description": "依据历史相似案例整理的施工任务。",
+          "quantity": 1,
+          "unit": {
+            "code": "UM0005",
+            "name": "台"
+          },
+          "work_items": [
+            {
+              "work_type": {
+                "code": "JN0008",
+                "name": "安装工"
+              },
+              "job_level": {
+                "code": "D5",
+                "name": "技师(P5)"
+              },
+              "persons": 1,
+              "hours": 110.0,
+              "confidence": "low",
+              "source": [
+                "s1_history_case:RH-2025-0009611001"
+              ]
+            },
+            {
+              "work_type": {
+                "code": "JN0002",
+                "name": "轮机工程师"
+              },
+              "job_level": {
+                "code": "MT5",
+                "name": "高级工程师(T5)"
+              },
+              "persons": 1,
+              "hours": 110.0,
+              "confidence": "low",
+              "source": [
+                "s1_history_case:RH-2025-0009611001"
+              ]
+            }
+          ],
+          "suggested_hours": {
+            "value": 110,
+            "confidence": "medium",
+            "source": [
+              "s2_workhour:主机常规坞修保养工作",
+              "s2_workhour_basis:history_case_avg",
+              "s2_workhour_basis:r5_rule:WH-001",
+              "s2_workhour_basis:risk_adjustment:交叉作业"
+            ]
+          },
+          "confidence": "high",
+          "source": [
+            "s1_history_case:RH-2025-0009611001",
+            "s2_workhour:主机常规坞修保养工作",
+            "s2_workhour_basis:history_case_avg",
+            "s2_workhour_basis:r5_rule:WH-001",
+            "s2_workhour_basis:risk_adjustment:交叉作业"
+          ],
+          "notes": []
+        }
+      ],
+      "totals": {
+        "is_voyage_repair": {
+          "value": true,
+          "confidence": "high",
+          "source": [
+            "s5_service_location_type"
+          ]
+        },
+        "total_hours": {
+          "value": 110,
+          "confidence": "medium",
+          "source": [
+            "s2_workhour:主机常规坞修保养工作"
+          ]
+        },
+        "total_persons": {
+          "value": 3,
+          "confidence": "medium",
+          "source": [
+            "s2_manpower"
+          ]
+        },
+        "explanation": "总小时数表示整体施工总时长；总人数表示理论最小所需人数，并非各任务人数直接相加。"
+      },
+      "tool_rows": [
+        {
+          "item_name": "LDM",
+          "item_model": null,
+          "item_type_code": 4,
+          "unit": {
+            "code": "UM0005",
+            "name": "台"
+          },
+          "quantity": 1,
+          "confidence": "high",
+          "source": [
+            "s1_history_case:RH-2025-0009611001"
+          ],
+          "notes": []
+        }
+      ],
+      "material_rows": [
+        {
+          "item_name": "氧气",
+          "item_model": "40L",
+          "item_type_code": null,
+          "unit": {
+            "code": "UM0018",
+            "name": "瓶"
+          },
+          "quantity": 3,
+          "confidence": "high",
+          "source": [
+            "s1_history_case:RH-2025-0009611001"
+          ],
+          "notes": []
+        }
+      ],
+      "special_tool_rows": [
+        {
+          "item_name": "驳船",
+          "item_model": "符合甲板面积",
+          "item_type_code": null,
+          "unit": {
+            "code": "UM0150",
+            "name": "次"
+          },
+          "quantity": 2,
+          "confidence": "high",
+          "source": [
+            "s1_history_case:RH-2025-0009611001"
+          ],
+          "notes": []
+        }
+      ],
+      "spare_parts_or_equipment": {
+        "customer_provided": [],
+        "provider_provided": [],
+        "to_be_confirmed": [
+          {
+            "item_name": "设备/备件需求",
+            "confidence": "low",
+            "source": [
+              "s1_history_case:RH-2025-0009611001"
+            ],
+            "notes": [
+              "历史案例可提供弱参考，但当前需求未明确设备/备件归属。"
+            ]
+          }
+        ]
+      }
+    },
+    "confidence_summary": {
+      "risks": "high",
+      "tasks": "medium",
+      "totals": "medium",
+      "tools": "high",
+      "materials": "high",
+      "special_tools": "high",
+      "spare_parts_or_equipment": "low"
+    },
+    "source_summary": {
+      "history_case_ids": [
+        "RH-2025-0009611001"
+      ],
+      "risk_rule_ids": [
+        "RISK-001"
+      ],
+      "workhour_rule_ids": [
+        "WH-001"
+      ],
+      "used_reference_types": [
+        "requirement",
+        "history_cases",
+        "assessment_reasoning"
+      ]
+    },
+    "warnings": [
+      {
+        "code": "SPARE_PARTS_NEED_UNCLEAR",
+        "message": "设备/备件归属缺乏明确依据，建议人工确认。",
+        "severity": "high"
+      }
+    ],
+    "review_focus": [
+      "请重点确认高风险项是否需要影响工期、资源投入或现场作业安排。",
+      "请重点确认设备/备件由客户提供、我方提供，还是仍待确认。",
+      "当前存在高优先级 warning，请工务人员优先处理。",
+      "请结合 warnings 列表优先复核数据稳定性不足的字段。"
+    ],
+    "metadata": {
+      "generated_at": "2026-03-24T00:00:00Z",
+      "generator_version": "1.1.0"
+    }
+  },
+  "error": null
+}

@@ -1,0 +1,8 @@
+{
+  "name": "generate-report-skill",
+  "slug": "generate-report-skill",
+  "version": "1.0.0",
+  "author": "09okjk",
+  "description": "Generate structured service assessment draft reports from confirmed requirements, history cases, and assessment reasoning results.",
+  "entry": "scripts/main.py"
+}

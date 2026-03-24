@@ -1,0 +1,128 @@
+{
+  "requirement": {
+    "requirement_id": "req-001",
+    "business_type": {
+      "code": "BT001",
+      "name": "轮机"
+    },
+    "service_desc": {
+      "code": "RS0000001761",
+      "name": "火警系统"
+    },
+    "service_type": {
+      "code": "CS0001",
+      "name": "维修"
+    },
+    "service_location_type": {
+      "code": "SL001",
+      "name": "港口"
+    },
+    "equipment_name": {
+      "code": "EN0001",
+      "name": "主机"
+    },
+    "equipment_model": {
+      "code": "ET000826",
+      "name": "MAN B&W-9S90ME-C9.2-TII"
+    },
+    "equipment_quantity": 1,
+    "equipment_unit": {
+      "code": "UM0005",
+      "name": "台"
+    },
+    "remark": "内含船厂常规工作，可能存在交叉作业与备件等待。设备/备件归属暂未明确。"
+  },
+  "history_cases": [
+    {
+      "case_id": "RH-2025-0009611001",
+      "task_description": "主机常规坞修���养工作",
+      "personnel": [
+        {
+          "work_type_code": "JN0002",
+          "work_type_name": "轮机工程师",
+          "job_level_code": "MT5",
+          "job_level_name": "高级工程师(T5)",
+          "quantity": 1,
+          "construction_hour": 110.0,
+          "task_desc": "主机常规坞修保养工作"
+        },
+        {
+          "work_type_code": "JN0008",
+          "work_type_name": "安装工",
+          "job_level_code": "D5",
+          "job_level_name": "技师(P5)",
+          "quantity": 1,
+          "construction_hour": 110.0,
+          "task_desc": "主机常规坞修保养工作"
+        }
+      ],
+      "tools": [
+        {
+          "toolName": "LDM",
+          "toolTypeNo": 4,
+          "quantity": 1,
+          "unitMeasurement": { "no": "UM0005", "zhName": "台" }
+        }
+      ],
+      "materials": [
+        {
+          "toolName": "氧气",
+          "model": "40L",
+          "quantity": 3,
+          "unitMeasurement": { "no": "UM0018", "zhName": "瓶" }
+        }
+      ],
+      "special_tools": [
+        {
+          "toolName": "驳船",
+          "model": "符合甲板面积",
+          "quantity": 2,
+          "unitMeasurement": { "no": "UM0150", "zhName": "次" }
+        }
+      ]
+    }
+  ],
+  "assessment_result": {
+    "risk_results": [
+      {
+        "risk_id": "RISK-001",
+        "risk_name": "船厂交叉作业导致工期延误",
+        "risk_level": "high",
+        "confidence": "high",
+        "trigger_basis": [
+          "remark_keyword:交叉作业",
+          "history_case:RH-2025-0009611001"
+        ],
+        "description": "现场存在交叉作业时，可能导致施工窗口受限与工期延误。",
+        "suggested_action": "建议预留工期缓冲，并提前确认现场作业窗口。"
+      }
+    ],
+    "workhour_results": [
+      {
+        "task_tag": "主机常规坞修保养工作",
+        "suggested_hours": 110,
+        "confidence": "medium",
+        "basis": [
+          "history_case_avg",
+          "r5_rule:WH-001",
+          "risk_adjustment:交叉作业"
+        ],
+        "note": "当前为单值估算结果，后续可升级为区间估算。"
+      }
+    ],
+    "manpower_result": {
+      "total_persons": 3,
+      "confidence": "medium",
+      "basis": [
+        "serial_reuse:true",
+        "job_level_cover:true"
+      ],
+      "explanation": "高职级人员可在串行任务中复用承担低职级任务，因此最小总人数为 3。"
+    }
+  },
+  "options": {
+    "output_language": "zh-CN",
+    "include_source_details": true,
+    "include_review_focus": true
+  }
+}
