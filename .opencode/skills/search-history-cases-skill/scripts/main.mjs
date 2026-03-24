@@ -39,63 +39,61 @@ function buildMatchReason(c, req, relaxed) {
 }
 
 async function queryCandidates(req, withServiceType, limit = 20) {
-  const sql = `
-    SELECT
-      er.id,
-      er.service_order_no,
-      er.business_type,
-      er.service_desc_name,
-      er.service_type_name,
-      er.equipment_model_code,
-      er.equipment_model_name,
-      er.equipment_qty,
-      er.equipment_unit,
-      er.task_description,
-      er.device_content,
-      er.risk_description,
-      er.total_persons,
-      er.total_days,
-      er.work_schedule,
-      er.construction_hours,
-      er.inspection_hours,
-      er.evaluated_at,
-      er.tools_content,
-      er.materials_content,
-      er.special_tools_content,
-      CASE
-        WHEN $5::text IS NOT NULL THEN similarity(er.task_description, $5::text)
-        ELSE 0
-      END AS task_sim_score
-    FROM evaluation_records er
-    WHERE
-      er.business_type = $1
-      AND er.service_desc_code = $2
-      ${withServiceType ? "AND ($3::text IS NULL OR er.service_type_code IS NULL OR er.service_type_code = $3)" : ""}
-    ORDER BY
-      CASE
-        WHEN $4::text IS NOT NULL AND er.equipment_model_code = $4 THEN 0
-        ELSE 1
-      END ASC,
-      task_sim_score DESC,
-      CASE
-        WHEN er.evaluated_at > NOW() - INTERVAL '2 years' THEN 0
-        WHEN er.evaluated_at > NOW() - INTERVAL '3 years' THEN 1
-        ELSE 2
-      END ASC,
-      er.evaluated_at DESC
-    LIMIT ${limit}
-  `;
-
-  const params = [
-    req.business_type,
-    req.service_desc_code,
-    req.service_type_code ?? null,
-    req.equipment_model_code ?? null,
-    req.task_description ?? null
-  ];
-
-  const { rows } = await pool.query(sql, params);
-  return rows;
+  if (withServiceType) {
+    const sql = `
+      SELECT
+        er.id, er.service_order_no, er.business_type, er.service_desc_name,
+        er.service_type_name, er.equipment_model_code, er.equipment_model_name,
+        er.equipment_qty, er.equipment_unit, er.task_description, er.device_content,
+        er.risk_description, er.total_persons, er.total_days, er.work_schedule,
+        er.construction_hours, er.inspection_hours, er.evaluated_at,
+        er.tools_content, er.materials_content, er.special_tools_content,
+        CASE WHEN COALESCE($5, '') != '' THEN similarity(er.task_description, $5) ELSE 0 END AS task_sim_score
+      FROM evaluation_records er
+      WHERE er.business_type = $1 AND er.service_desc_code = $2
+        AND (COALESCE($3, '') = '' OR er.service_type_code IS NULL OR er.service_type_code = $3)
+      ORDER BY
+        CASE WHEN COALESCE($4, '') != '' AND er.equipment_model_code = $4 THEN 0 ELSE 1 END ASC,
+        task_sim_score DESC,
+        CASE WHEN er.evaluated_at > NOW() - INTERVAL '2 years' THEN 0 WHEN er.evaluated_at > NOW() - INTERVAL '3 years' THEN 1 ELSE 2 END ASC,
+        er.evaluated_at DESC
+      LIMIT ${limit}
+    `;
+    const { rows } = await pool.query(sql, [
+      req.business_type || "",
+      req.service_desc_code || "",
+      req.service_type_code || "",
+      req.equipment_model_code || "",
+      req.task_description || ""
+    ]);
+    return rows;
+  } else {
+    const sql = `
+      SELECT
+        er.id, er.service_order_no, er.business_type, er.service_desc_name,
+        er.service_type_name, er.equipment_model_code, er.equipment_model_name,
+        er.equipment_qty, er.equipment_unit, er.task_description, er.device_content,
+        er.risk_description, er.total_persons, er.total_days, er.work_schedule,
+        er.construction_hours, er.inspection_hours, er.evaluated_at,
+        er.tools_content, er.materials_content, er.special_tools_content,
+        CASE WHEN COALESCE($4, '') != '' THEN similarity(er.task_description, $4) ELSE 0 END AS task_sim_score
+      FROM evaluation_records er
+      WHERE er.business_type = $1 AND er.service_desc_code = $2
+      ORDER BY
+        CASE WHEN COALESCE($3, '') != '' AND er.equipment_model_code = $3 THEN 0 ELSE 1 END ASC,
+        task_sim_score DESC,
+        CASE WHEN er.evaluated_at > NOW() - INTERVAL '2 years' THEN 0 WHEN er.evaluated_at > NOW() - INTERVAL '3 years' THEN 1 ELSE 2 END ASC,
+        er.evaluated_at DESC
+      LIMIT ${limit}
+    `;
+    const { rows } = await pool.query(sql, [
+      req.business_type || "",
+      req.service_desc_code || "",
+      req.equipment_model_code || "",
+      req.task_description || ""
+    ]);
+    return rows;
+  }
 }
 
 async function fetchPersonnel(recordIds) {

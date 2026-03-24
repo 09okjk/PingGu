@@ -57,7 +57,10 @@ metadata:
 
 ## Setup
 
+### 基础用法
+
 ```bash
+# 从 JSON 文件读取输入
 python3 {baseDir}/scripts/main.py \
   --action parse \
   --json-input-file "{baseDir}/samples/sample-input.json" \
@@ -65,21 +68,55 @@ python3 {baseDir}/scripts/main.py \
   --pretty
 ```
 
-修订：
+### 快速测试（4 种方式）
+
+**方式 1: 命令行直接输入文本**
 ```bash
-python3 {baseDir}/scripts/main.py \
-  --action revise \
-  --json-input-file "{baseDir}/samples/sample-revise-input.json" \
-  --refs "{baseDir}/references/r2-sample-enums.json" \
+python3 scripts/main.py --action parse \
+  --input "The main engine shows abnormal vibration" \
+  --refs references/r2-sample-enums.json \
   --pretty
 ```
 
-确认：
+**方式 2: 从文件读取文本**
 ```bash
-python3 {baseDir}/scripts/main.py \
-  --action confirm \
-  --json-input-file "{baseDir}/samples/sample-confirm-input.json" \
-  --refs "{baseDir}/references/r2-sample-enums.json" \
+python3 scripts/main.py --action parse \
+  --input-file sample-email.txt \
+  --refs references/r2-sample-enums.json \
+  --pretty
+```
+
+**方式 3: JSON payload（命令行）**
+```bash
+python3 scripts/main.py --action parse \
+  --json-input '{"email_text": "Engine needs inspection"}' \
+  --refs references/r2-sample-enums.json \
+  --pretty
+```
+
+**方式 4: JSON payload（文件）**
+```bash
+python3 scripts/main.py --action parse \
+  --json-input-file samples/sample-input.json \
+  --refs references/r2-sample-enums.json \
+  --pretty
+```
+
+### 修订和确认
+
+**修订阶段**:
+```bash
+python3 scripts/main.py --action revise \
+  --json-input '{"session_id": "sess-xxx", "current_requirements": [...], "user_feedback": "改成维修"}' \
+  --refs references/r2-sample-enums.json \
+  --pretty
+```
+
+**确认阶段**:
+```bash
+python3 scripts/main.py --action confirm \
+  --json-input '{"session_id": "sess-xxx", "current_requirements": [...]}' \
+  --refs references/r2-sample-enums.json \
   --pretty
 ```
 
@@ -193,7 +230,79 @@ LOG_LEVEL=INFO      # 日志级别
 
 详见 `.env.example` 和 `references/config.md`。
 
----
+## Troubleshooting（常见问题）
+
+### 1. 错误：`FILE_NOT_FOUND`
+
+**原因**: 输入文件路径不正确
+
+**解决方法**:
+```bash
+# 使用绝对路径
+python3 scripts/main.py --action parse \
+  --input-file "/absolute/path/to/email.txt" \
+  --refs references/r2-sample-enums.json
+
+# 或使用相对路径（从 skill 目录出发）
+cd .opencode/skills/parse-requirement-skill
+python3 scripts/main.py --action parse \
+  --input-file samples/sample-email.txt \
+  --refs references/r2-sample-enums.json
+```
+
+### 2. 错误：`INVALID_JSON`
+
+**原因**: JSON 文件格式不正确
+
+**解决方法**:
+- 检查 JSON 语法（使用 `jq . input.json` 或在线工具）
+- 确保使用 UTF-8 编码保存文件
+- 检查是否有 trailing comma
+
+### 3. 解析结果为空或字段为 null
+
+**原因**: 参考枚举文件中没有匹配的条目
+
+**解决方法**:
+- 检查 `references/r2-sample-enums.json` 中的枚举定义
+- 在 `service_desc_enum`、`service_type_enum`、`equipment_name_enum` 中添加相关别名
+- 使用 `--strict` 模式查看置信度
+
+**示例：添加新枚举**
+```json
+{
+  "service_desc_enum": [
+    {
+      "code": "SD006",
+      "name": "火灾报警系统",
+      "aliases": ["fire alarm", "consilium", "alarm system", "火灾报警"]
+    }
+  ]
+}
+```
+
+### 4. 识别出多个服务项但实际只有一个
+
+**原因**: 文本中包含多个动作或设备关键词
+
+**解决方法**:
+- 在 revise 阶段合并服务项
+- 调整 `split_keywords` 配置
+- 简化邮件描述，分段发送
+
+### 5. 语言检测错误
+
+**原因**: 多语言混合内容
+
+**解决方法**:
+```bash
+# 强制指定语言
+python3 scripts/main.py --action parse \
+  --input "邮件文本" \
+  --refs references/r2-sample-enums.json \
+  --lang en \
+  --pretty
+```
 
 ## Related Skills
 
