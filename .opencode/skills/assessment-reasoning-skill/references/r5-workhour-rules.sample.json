@@ -1,0 +1,23 @@
+[
+  {
+    "rule_id": "WH-001",
+    "service_type_code": "CS0017",
+    "equipment_name_code": "EN0001",
+    "task_tag": "主机常规坞修保养工作",
+    "work_type_code": "WT0001",
+    "baseline_hours": 100,
+    "quantity_factor": 0.25,
+    "risk_adjustments": [
+      {
+        "trigger": "交叉作业",
+        "multiplier": 1.1
+      },
+      {
+        "trigger": "备件等待",
+        "multiplier": 1.15
+      }
+    ],
+    "sample_size": 8,
+    "is_active": true
+  }
+]

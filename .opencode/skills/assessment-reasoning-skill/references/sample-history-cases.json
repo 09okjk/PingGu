@@ -1,0 +1,31 @@
+[
+  {
+    "case_id": "RH-2025-0009611001",
+    "risk_description": "内含船厂常规工作，工期因交叉作业、备件、船厂进出坞等因素导致延迟。",
+    "task_description": "主机常规坞修保养工作",
+    "total_persons": 9,
+    "personnel": [
+      {
+        "work_type_name": "轮机工程师",
+        "job_level_name": "高级工程师(T5)",
+        "quantity": 2,
+        "construction_hour": 110.0,
+        "task_desc": "主机常规坞修保养工作"
+      },
+      {
+        "work_type_name": "安装工",
+        "job_level_name": "技师(P5)",
+        "quantity": 1,
+        "construction_hour": 110.0,
+        "task_desc": "主机常规坞修保养工作"
+      },
+      {
+        "work_type_name": "安装工",
+        "job_level_name": "高级技工(P4)",
+        "quantity": 1,
+        "construction_hour": 110.0,
+        "task_desc": "主机常规坞修保养工作"
+      }
+    ]
+  }
+]

@@ -1,0 +1,39 @@
+{
+  "global_rules": {
+    "higher_level_can_cover_lower_level": true,
+    "cross_work_type_substitution": false,
+    "allow_serial_reuse": true
+  },
+  "level_cover_rules": [
+    {
+      "work_type_name": "轮机工程师",
+      "higher_level_name": "高级工程师(T5)",
+      "lower_level_name": "中级工程师(T4)",
+      "is_active": true
+    },
+    {
+      "work_type_name": "轮机工程师",
+      "higher_level_name": "高级工程师(T5)",
+      "lower_level_name": "初级工程师(T3)",
+      "is_active": true
+    },
+    {
+      "work_type_name": "安装工",
+      "higher_level_name": "技师(P5)",
+      "lower_level_name": "高级技工(P4)",
+      "is_active": true
+    },
+    {
+      "work_type_name": "安装工",
+      "higher_level_name": "技师(P5)",
+      "lower_level_name": "中级技工(P3)",
+      "is_active": true
+    },
+    {
+      "work_type_name": "安装工",
+      "higher_level_name": "技师(P5)",
+      "lower_level_name": "初级工(P2)",
+      "is_active": true
+    }
+  ]
+}

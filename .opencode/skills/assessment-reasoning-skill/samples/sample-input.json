@@ -1,0 +1,55 @@
+{
+  "requirement": {
+    "requirement_id": "req-001",
+    "business_type": {
+      "code": "BT0001",
+      "name": "轮机"
+    },
+    "service_desc": {
+      "code": "RS0001",
+      "name": "二冲程柴油机"
+    },
+    "service_type": {
+      "code": "CS0017",
+      "name": "保养10年"
+    },
+    "equipment_name": {
+      "code": "EN0001",
+      "name": "主机"
+    },
+    "equipment_model": {
+      "code": "ET000826",
+      "name": "MAN B&W-9S90ME-C9.2-TII"
+    },
+    "equipment_quantity": 1,
+    "equipment_unit": {
+      "code": "UM0001",
+      "name": "台"
+    },
+    "remark": "内含船厂常规工作，可能存在交叉作业与备件等待。"
+  },
+  "history_cases": [
+    {
+      "case_id": "RH-2025-0009611001",
+      "risk_description": "内含船厂常规工作，工期因交叉作业、备件、船厂进出坞等因素导致延迟。",
+      "task_description": "主机常规坞修保养工作",
+      "total_persons": 9,
+      "personnel": [
+        {
+          "work_type_name": "轮机工程师",
+          "job_level_name": "高级工程师(T5)",
+          "quantity": 2,
+          "construction_hour": 110.0,
+          "task_desc": "主机常规坞修保养工作"
+        },
+        {
+          "work_type_name": "安装工",
+          "job_level_name": "技师(P5)",
+          "quantity": 1,
+          "construction_hour": 110.0,
+          "task_desc": "主机常规坞修保养工作"
+        }
+      ]
+    }
+  ]
+}

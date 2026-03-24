@@ -1,0 +1,26 @@
+[
+  {
+    "risk_id": "RISK-001",
+    "risk_name": "船厂交叉作业导致工期延误",
+    "risk_level": "high",
+    "description": "现场存在交叉作业时，可能导致施工窗口受限与工期延误。",
+    "suggested_action": "建议预留工期���冲，并提前确认现场作业窗口。",
+    "service_type_codes": ["CS0017"],
+    "equipment_name_codes": ["EN0001"],
+    "equipment_model_codes": [],
+    "keyword_triggers": ["交叉作业", "进出坞", "船厂限制", "备件等待"],
+    "is_active": true
+  },
+  {
+    "risk_id": "RISK-002",
+    "risk_name": "备件等待影响施工进度",
+    "risk_level": "medium",
+    "description": "若关键备件未及时到位，施工可能中断或延期。",
+    "suggested_action": "建议提前核实备件齐套情况，并设置关键备件到货检查点。",
+    "service_type_codes": ["CS0017"],
+    "equipment_name_codes": ["EN0001"],
+    "equipment_model_codes": [],
+    "keyword_triggers": ["备件等待", "备件未到", "���件"],
+    "is_active": true
+  }
+]
