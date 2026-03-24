@@ -118,7 +118,9 @@ async function fetchPersonnel(recordIds) {
   for (const r of rows) {
     if (!map[r.record_id]) map[r.record_id] = [];
     map[r.record_id].push({
+      work_type_code: r.work_type_code,
       work_type_name: r.work_type_name,
+      job_level_code: r.job_level_code,
       job_level_name: r.job_level_name,
       quantity: r.quantity,
       construction_hour: r.construction_hour,
