@@ -1,0 +1,82 @@
+[
+  {
+    "rule_id": "WH-001",
+    "service_type_code": "CS0017",
+    "equipment_name_code": "RS0000000001",
+    "task_tag": "主机常规坞修保养工作",
+    "work_type_code": "JN0002",
+    "baseline_hours": 100,
+    "quantity_factor": 0.25,
+    "risk_adjustments": [
+      {
+        "trigger": "交叉作业",
+        "multiplier": 1.1
+      },
+      {
+        "trigger": "备件等待",
+        "multiplier": 1.15
+      }
+    ],
+    "sample_size": 8,
+    "is_active": true
+  },
+  {
+    "rule_id": "WH-002",
+    "service_type_code": "CS0001",
+    "equipment_name_code": "RS0000001761",
+    "task_tag": "火警系统故障检修",
+    "work_type_code": "JN0001",
+    "baseline_hours": 16,
+    "quantity_factor": 0.5,
+    "risk_adjustments": [
+      {
+        "trigger": "电气",
+        "multiplier": 1.1
+      },
+      {
+        "trigger": "报警系统",
+        "multiplier": 1.05
+      }
+    ],
+    "sample_size": 5,
+    "is_active": true
+  },
+  {
+    "rule_id": "WH-003",
+    "service_type_code": "CS0001",
+    "equipment_name_code": "RS0000001695",
+    "task_tag": "主配电板维修",
+    "work_type_code": "JN0001",
+    "baseline_hours": 24,
+    "quantity_factor": 0.3,
+    "risk_adjustments": [
+      {
+        "trigger": "带电作业",
+        "multiplier": 1.2
+      }
+    ],
+    "sample_size": 3,
+    "is_active": true
+  },
+  {
+    "rule_id": "WH-004",
+    "service_type_code": "CS0007",
+    "equipment_name_code": "RS0000000535",
+    "task_tag": "四冲程柴油机更换",
+    "work_type_code": "JN0002",
+    "baseline_hours": 120,
+    "quantity_factor": 0.2,
+    "risk_adjustments": [
+      {
+        "trigger": "吊装",
+        "multiplier": 1.15
+      },
+      {
+        "trigger": "对中",
+        "multiplier": 1.1
+      }
+    ],
+    "sample_size": 6,
+    "is_active": true
+  }
+]

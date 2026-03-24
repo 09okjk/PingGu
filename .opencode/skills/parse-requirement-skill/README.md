@@ -19,7 +19,7 @@ parse-requirement-skill/
 │   └── main.py
 ├── references/
 │   ├── config.md
-│   ├── r2-sample-enums.json
+│   ├── r2-enums.json
 │   ├── aliases.json
 │   └── *.schema.json
 └── samples/
@@ -33,7 +33,7 @@ parse-requirement-skill/
 python3 scripts/main.py \
   --action parse \
   --json-input-file samples/sample-input.json \
-  --refs references/r2-sample-enums.json \
+  --refs references/r2-enums.json \
   --pretty
 ```
 
@@ -42,7 +42,7 @@ python3 scripts/main.py \
 python3 scripts/main.py \
   --action revise \
   --json-input-file samples/sample-revise-input.json \
-  --refs references/r2-sample-enums.json \
+  --refs references/r2-enums.json \
   --pretty
 ```
 
@@ -51,7 +51,7 @@ python3 scripts/main.py \
 python3 scripts/main.py \
   --action confirm \
   --json-input-file samples/sample-confirm-input.json \
-  --refs references/r2-sample-enums.json \
+  --refs references/r2-enums.json \
   --pretty
 ```
 

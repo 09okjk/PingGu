@@ -1,0 +1,50 @@
+[
+  {
+    "risk_id": "RISK-001",
+    "risk_name": "船厂交叉作业导致工期延误",
+    "risk_level": "high",
+    "description": "现场存在交叉作业时，可能导致施工窗口受限与工期延误。",
+    "suggested_action": "建议预留工期缓冲，并提前确认现场作业窗口。",
+    "service_type_codes": ["CS0017"],
+    "equipment_name_codes": ["RS0000000001"],
+    "equipment_model_codes": [],
+    "keyword_triggers": ["交叉作业", "进出坞", "船厂限制", "备件等待"],
+    "is_active": true
+  },
+  {
+    "risk_id": "RISK-002",
+    "risk_name": "备件等待影响施工进度",
+    "risk_level": "medium",
+    "description": "若关键备件未及时到位，施工可能中断或延期。",
+    "suggested_action": "建议提前核实备件齐套情况，并设置关键备件到货检查点。",
+    "service_type_codes": ["CS0017"],
+    "equipment_name_codes": ["RS0000000001"],
+    "equipment_model_codes": [],
+    "keyword_triggers": ["备件等待", "备件未到", "备件"],
+    "is_active": true
+  },
+  {
+    "risk_id": "RISK-003",
+    "risk_name": "电气系统故障排查风险",
+    "risk_level": "medium",
+    "description": "电气系统故障可能涉及多个回路，排查难度大。",
+    "suggested_action": "建议携带完整检测设备和电路图，做好绝缘防护。",
+    "service_type_codes": ["CS0001"],
+    "equipment_name_codes": ["RS0000001761"],
+    "equipment_model_codes": [],
+    "keyword_triggers": ["火警", "电气", "报警系统", "Consilium"],
+    "is_active": true
+  },
+  {
+    "risk_id": "RISK-004",
+    "risk_name": "高空作业安全风险",
+    "risk_level": "high",
+    "description": "涉及高空作业时存在坠落风险。",
+    "suggested_action": "必须佩戴安全带，设置安全监护人员。",
+    "service_type_codes": ["CS0001", "CS0007"],
+    "equipment_name_codes": [],
+    "equipment_model_codes": [],
+    "keyword_triggers": ["高空", "桅杆", "天线"],
+    "is_active": true
+  }
+]

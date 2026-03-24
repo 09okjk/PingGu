@@ -136,12 +136,50 @@ python3 scripts/main.py \
 
 ## PostgreSQL 表要求
 
-当前读取以下表：
+### 核心规则表
+- `risk_rules` - 风险识别规则
+- `workhour_rules` - 工时估算规则
+- `manpower_global_rules` - 人力配置全局规则
+- `manpower_level_cover_rules` - 职级覆盖规则（基于工种代码和职级代码）
 
-- `risk_rules`
-- `workhour_rules`
-- `manpower_global_rules`
-- `manpower_level_cover_rules`
+### 基础数据表（可选）
+- `work_types` - 工种配置表（25 个工种）
+- `job_levels` - 职级配置表（193 个职级）
+
+### 表结构说明
+
+**manpower_level_cover_rules**:
+```sql
+CREATE TABLE manpower_level_cover_rules (
+    id BIGSERIAL PRIMARY KEY,
+    work_type_code VARCHAR(20) NOT NULL,  -- 工种代码 (如 JN0001)
+    higher_level_code VARCHAR(20) NOT NULL, -- 高职级代码 (如 ET3)
+    lower_level_code VARCHAR(20) NOT NULL,  -- 低职级代码 (如 ET1)
+    is_active BOOLEAN DEFAULT TRUE,
+    FOREIGN KEY (work_type_code) REFERENCES work_types(work_type_code)
+);
+```
+
+**work_types**:
+```sql
+CREATE TABLE work_types (
+    work_type_code VARCHAR(20) PRIMARY KEY,  -- JN0001
+    work_type_name_cn VARCHAR(100),          -- 电气工程师
+    work_type_name_en VARCHAR(100)           -- Electrical Engineer
+);
+```
+
+**job_levels**:
+```sql
+CREATE TABLE job_levels (
+    id SERIAL PRIMARY KEY,
+    work_type_code VARCHAR(20) NOT NULL,
+    job_level_code VARCHAR(20) NOT NULL,  -- ET1, MT5, D10 等
+    job_level_name VARCHAR(50),
+    level_order INTEGER NOT NULL,
+    FOREIGN KEY (work_type_code) REFERENCES work_types(work_type_code)
+);
+```
 
 如数据库未配置完整，可先关闭 `PINGGU_USE_DB`，继续使用 JSON 模式。
 

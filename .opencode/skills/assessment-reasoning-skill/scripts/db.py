@@ -12,13 +12,24 @@ load_env_file()
 class ReferenceRepository:
     """
     Reference 读取仓储：
-    - 本地 JSON 模式
-    - PostgreSQL 模式
+    - 数据库优先模式（生产推荐）
+    - 本地 JSON 降级模式（离线调试）
     """
 
     def __init__(self, refs_dir: str):
         self.refs_dir = refs_dir
-        self.use_db = get_bool_env("PINGGU_USE_DB", False)
+        self.use_db = get_bool_env("PINGGU_USE_DB", True)  # 默认启用数据库模式
+
+        if not self.use_db:
+            import warnings
+
+            warnings.warn(
+                "⚠️  当前使用本地 JSON 模式（离线调试）。"
+                "生产环境应设置 PINGGU_USE_DB=true 从数据库读取规则。",
+                UserWarning,
+                stacklevel=2,
+            )
+
         self._conn = None
 
     def _ensure_connection(self):
@@ -127,7 +138,7 @@ class ReferenceRepository:
                     )
                 return normalized
 
-        return load_json_file(refs_path(self.refs_dir, "r3-risk-rules.sample.json"))
+        return load_json_file(refs_path(self.refs_dir, "r3-risk-rules.json"))
 
     def get_workhour_rules(self) -> List[Dict[str, Any]]:
         if self.use_db:
@@ -175,7 +186,7 @@ class ReferenceRepository:
                     )
                 return normalized
 
-        return load_json_file(refs_path(self.refs_dir, "r5-workhour-rules.sample.json"))
+        return load_json_file(refs_path(self.refs_dir, "r5-workhour-rules.json"))
 
     def get_manpower_rules(self) -> Dict[str, Any]:
         if self.use_db:
@@ -186,13 +197,13 @@ class ReferenceRepository:
             """
             level_sql = """
                 SELECT
-                    work_type_name,
-                    higher_level_name,
-                    lower_level_name,
+                    work_type_code,
+                    higher_level_code,
+                    lower_level_code,
                     is_active
                 FROM manpower_level_cover_rules
                 WHERE is_active = TRUE
-                ORDER BY work_type_name, higher_level_name, lower_level_name;
+                ORDER BY work_type_code, higher_level_code, lower_level_code;
             """
 
             global_rows = self._fetch_all(global_sql)
@@ -214,16 +225,16 @@ class ReferenceRepository:
                     "global_rules": global_rules,
                     "level_cover_rules": [
                         {
-                            "work_type_name": row["work_type_name"],
-                            "higher_level_name": row["higher_level_name"],
-                            "lower_level_name": row["lower_level_name"],
+                            "work_type_code": row["work_type_code"],
+                            "higher_level_code": row["higher_level_code"],
+                            "lower_level_code": row["lower_level_code"],
                             "is_active": bool(row.get("is_active", True)),
                         }
                         for row in level_rows
                     ],
                 }
 
-        return load_json_file(refs_path(self.refs_dir, "r6-manpower-rules.sample.json"))
+        return load_json_file(refs_path(self.refs_dir, "r6-manpower-rules.json"))
 
     def close(self):
         if self._conn is not None:

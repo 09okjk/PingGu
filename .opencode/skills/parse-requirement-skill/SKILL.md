@@ -64,7 +64,7 @@ metadata:
 python3 {baseDir}/scripts/main.py \
   --action parse \
   --json-input-file "{baseDir}/samples/sample-input.json" \
-  --refs "{baseDir}/references/r2-sample-enums.json" \
+  --refs "{baseDir}/references/r2-enums.json" \
   --pretty
 ```
 
@@ -74,7 +74,7 @@ python3 {baseDir}/scripts/main.py \
 ```bash
 python3 scripts/main.py --action parse \
   --input "The main engine shows abnormal vibration" \
-  --refs references/r2-sample-enums.json \
+  --refs references/r2-enums.json \
   --pretty
 ```
 
@@ -82,7 +82,7 @@ python3 scripts/main.py --action parse \
 ```bash
 python3 scripts/main.py --action parse \
   --input-file sample-email.txt \
-  --refs references/r2-sample-enums.json \
+  --refs references/r2-enums.json \
   --pretty
 ```
 
@@ -90,7 +90,7 @@ python3 scripts/main.py --action parse \
 ```bash
 python3 scripts/main.py --action parse \
   --json-input '{"email_text": "Engine needs inspection"}' \
-  --refs references/r2-sample-enums.json \
+  --refs references/r2-enums.json \
   --pretty
 ```
 
@@ -98,7 +98,7 @@ python3 scripts/main.py --action parse \
 ```bash
 python3 scripts/main.py --action parse \
   --json-input-file samples/sample-input.json \
-  --refs references/r2-sample-enums.json \
+  --refs references/r2-enums.json \
   --pretty
 ```
 
@@ -108,7 +108,7 @@ python3 scripts/main.py --action parse \
 ```bash
 python3 scripts/main.py --action revise \
   --json-input '{"session_id": "sess-xxx", "current_requirements": [...], "user_feedback": "改成维修"}' \
-  --refs references/r2-sample-enums.json \
+  --refs references/r2-enums.json \
   --pretty
 ```
 
@@ -116,7 +116,7 @@ python3 scripts/main.py --action revise \
 ```bash
 python3 scripts/main.py --action confirm \
   --json-input '{"session_id": "sess-xxx", "current_requirements": [...]}' \
-  --refs references/r2-sample-enums.json \
+  --refs references/r2-enums.json \
   --pretty
 ```
 
@@ -148,25 +148,25 @@ python3 scripts/main.py --action confirm \
 **parse 阶段**（4 种方式）:
 ```bash
 # 方式 1: 命令行直接输入
-python3 scripts/main.py --action parse --input "邮件文本" --refs references/r2-sample-enums.json
+python3 scripts/main.py --action parse --input "邮件文本" --refs references/r2-enums.json
 
 # 方式 2: 从文件读取文本
-python3 scripts/main.py --action parse --input-file sample-email.txt --refs references/r2-sample-enums.json
+python3 scripts/main.py --action parse --input-file sample-email.txt --refs references/r2-enums.json
 
 # 方式 3: JSON payload（命令行）
-python3 scripts/main.py --action parse --json-input '{"email_text": "..."}' --refs references/r2-sample-enums.json
+python3 scripts/main.py --action parse --json-input '{"email_text": "..."}' --refs references/r2-enums.json
 
 # 方式 4: JSON payload（文件）
-python3 scripts/main.py --action parse --json-input-file samples/sample-input.json --refs references/r2-sample-enums.json
+python3 scripts/main.py --action parse --json-input-file samples/sample-input.json --refs references/r2-enums.json
 ```
 
 **revise/confirm 阶段**（2 种方式，必须使用 JSON）:
 ```bash
 # 方式 1: JSON payload（命令行）
-python3 scripts/main.py --action revise --json-input '{"session_id": "...", ...}' --refs references/r2-sample-enums.json
+python3 scripts/main.py --action revise --json-input '{"session_id": "...", ...}' --refs references/r2-enums.json
 
 # 方式 2: JSON payload（文件）
-python3 scripts/main.py --action revise --json-input-file samples/sample-revise-input.json --refs references/r2-sample-enums.json
+python3 scripts/main.py --action revise --json-input-file samples/sample-revise-input.json --refs references/r2-enums.json
 ```
 
 ---
@@ -241,13 +241,13 @@ LOG_LEVEL=INFO      # 日志级别
 # 使用绝对路径
 python3 scripts/main.py --action parse \
   --input-file "/absolute/path/to/email.txt" \
-  --refs references/r2-sample-enums.json
+  --refs references/r2-enums.json
 
 # 或使用相对路径（从 skill 目录出发）
 cd .opencode/skills/parse-requirement-skill
 python3 scripts/main.py --action parse \
   --input-file samples/sample-email.txt \
-  --refs references/r2-sample-enums.json
+  --refs references/r2-enums.json
 ```
 
 ### 2. 错误：`INVALID_JSON`
@@ -264,7 +264,7 @@ python3 scripts/main.py --action parse \
 **原因**: 参考枚举文件中没有匹配的条目
 
 **解决方法**:
-- 检查 `references/r2-sample-enums.json` 中的枚举定义
+- 检查 `references/r2-enums.json` 中的枚举定义
 - 在 `service_desc_enum`、`service_type_enum`、`equipment_name_enum` 中添加相关别名
 - 使用 `--strict` 模式查看置信度
 
@@ -299,7 +299,7 @@ python3 scripts/main.py --action parse \
 # 强制指定语言
 python3 scripts/main.py --action parse \
   --input "邮件文本" \
-  --refs references/r2-sample-enums.json \
+  --refs references/r2-enums.json \
   --lang en \
   --pretty
 ```

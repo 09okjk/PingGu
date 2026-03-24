@@ -1,0 +1,195 @@
+{
+  "global_rules": {
+    "higher_level_can_cover_lower_level": true,
+    "cross_work_type_substitution": false,
+    "allow_serial_reuse": true
+  },
+  "level_cover_rules": [
+    {
+      "work_type_code": "JN0001",
+      "higher_level_code": "ET6",
+      "lower_level_code": "ET1",
+      "is_active": true
+    },
+    {
+      "work_type_code": "JN0001",
+      "higher_level_code": "ET6",
+      "lower_level_code": "ET2",
+      "is_active": true
+    },
+    {
+      "work_type_code": "JN0001",
+      "higher_level_code": "ET6",
+      "lower_level_code": "ET3",
+      "is_active": true
+    },
+    {
+      "work_type_code": "JN0001",
+      "higher_level_code": "ET5",
+      "lower_level_code": "ET1",
+      "is_active": true
+    },
+    {
+      "work_type_code": "JN0001",
+      "higher_level_code": "ET5",
+      "lower_level_code": "ET2",
+      "is_active": true
+    },
+    {
+      "work_type_code": "JN0001",
+      "higher_level_code": "ET5",
+      "lower_level_code": "ET3",
+      "is_active": true
+    },
+    {
+      "work_type_code": "JN0001",
+      "higher_level_code": "ET4",
+      "lower_level_code": "ET1",
+      "is_active": true
+    },
+    {
+      "work_type_code": "JN0001",
+      "higher_level_code": "ET4",
+      "lower_level_code": "ET2",
+      "is_active": true
+    },
+    {
+      "work_type_code": "JN0001",
+      "higher_level_code": "ET4",
+      "lower_level_code": "ET3",
+      "is_active": true
+    },
+    {
+      "work_type_code": "JN0001",
+      "higher_level_code": "ET3",
+      "lower_level_code": "ET1",
+      "is_active": true
+    },
+    {
+      "work_type_code": "JN0001",
+      "higher_level_code": "ET3",
+      "lower_level_code": "ET2",
+      "is_active": true
+    },
+    {
+      "work_type_code": "JN0001",
+      "higher_level_code": "ET2",
+      "lower_level_code": "ET1",
+      "is_active": true
+    },
+    {
+      "work_type_code": "JN0002",
+      "higher_level_code": "MT6",
+      "lower_level_code": "MT1",
+      "is_active": true
+    },
+    {
+      "work_type_code": "JN0002",
+      "higher_level_code": "MT5",
+      "lower_level_code": "MT1",
+      "is_active": true
+    },
+    {
+      "work_type_code": "JN0002",
+      "higher_level_code": "MT5",
+      "lower_level_code": "MT2",
+      "is_active": true
+    },
+    {
+      "work_type_code": "JN0002",
+      "higher_level_code": "MT4",
+      "lower_level_code": "MT1",
+      "is_active": true
+    },
+    {
+      "work_type_code": "JN0002",
+      "higher_level_code": "MT4",
+      "lower_level_code": "MT2",
+      "is_active": true
+    },
+    {
+      "work_type_code": "JN0002",
+      "higher_level_code": "MT4",
+      "lower_level_code": "MT3",
+      "is_active": true
+    },
+    {
+      "work_type_code": "JN0002",
+      "higher_level_code": "MT3",
+      "lower_level_code": "MT1",
+      "is_active": true
+    },
+    {
+      "work_type_code": "JN0002",
+      "higher_level_code": "MT3",
+      "lower_level_code": "MT2",
+      "is_active": true
+    },
+    {
+      "work_type_code": "JN0002",
+      "higher_level_code": "MT2",
+      "lower_level_code": "MT1",
+      "is_active": true
+    },
+    {
+      "work_type_code": "JN0008",
+      "higher_level_code": "EP6",
+      "lower_level_code": "EP1",
+      "is_active": true
+    },
+    {
+      "work_type_code": "JN0008",
+      "higher_level_code": "EP5",
+      "lower_level_code": "EP1",
+      "is_active": true
+    },
+    {
+      "work_type_code": "JN0008",
+      "higher_level_code": "EP4",
+      "lower_level_code": "EP1",
+      "is_active": true
+    },
+    {
+      "work_type_code": "JN0008",
+      "higher_level_code": "EP3",
+      "lower_level_code": "EP1",
+      "is_active": true
+    },
+    {
+      "work_type_code": "JN0008",
+      "higher_level_code": "EP3",
+      "lower_level_code": "EP2",
+      "is_active": true
+    },
+    {
+      "work_type_code": "JN0008",
+      "higher_level_code": "EP2",
+      "lower_level_code": "EP1",
+      "is_active": true
+    },
+    {
+      "work_type_code": "JN0014",
+      "higher_level_code": "D20",
+      "lower_level_code": "D1",
+      "is_active": true
+    },
+    {
+      "work_type_code": "JN0014",
+      "higher_level_code": "D15",
+      "lower_level_code": "D10",
+      "is_active": true
+    },
+    {
+      "work_type_code": "JN0014",
+      "higher_level_code": "D10",
+      "lower_level_code": "D5",
+      "is_active": true
+    },
+    {
+      "work_type_code": "JN0014",
+      "higher_level_code": "D5",
+      "lower_level_code": "D1",
+      "is_active": true
+    }
+  ]
+}

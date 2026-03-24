@@ -1,31 +1,115 @@
-[
-  {
-    "case_id": "RH-2025-0009611001",
-    "risk_description": "内含船厂常规工作，工期因交叉作业、备件、船厂进出坞等因素导致延迟。",
-    "task_description": "主机常规坞修保养工作",
-    "total_persons": 9,
-    "personnel": [
-      {
-        "work_type_name": "轮机工程师",
-        "job_level_name": "高级工程师(T5)",
-        "quantity": 2,
-        "construction_hour": 110.0,
-        "task_desc": "主机常规坞修保养工作"
-      },
-      {
-        "work_type_name": "安装工",
-        "job_level_name": "技师(P5)",
-        "quantity": 1,
-        "construction_hour": 110.0,
-        "task_desc": "主机常规坞修保养工作"
-      },
-      {
-        "work_type_name": "安装工",
-        "job_level_name": "高级技工(P4)",
-        "quantity": 1,
-        "construction_hour": 110.0,
-        "task_desc": "主机常规坞修保养工作"
-      }
-    ]
-  }
-]
+{
+  "requirement": {
+    "requirement_id": "req-001",
+    "business_type": {
+      "code": "BT001",
+      "name": "电气"
+    },
+    "service_desc": {
+      "code": "RS0000001761",
+      "name": "火警系统"
+    },
+    "service_type": {
+      "code": "CS0001",
+      "name": "维修"
+    },
+    "equipment_name": "火警系统",
+    "equipment_model": null,
+    "equipment_manufacturer": "Consilium",
+    "equipment_quantity": 1,
+    "equipment_unit": "套",
+    "service_device_models": ["IOK-4", "AKK-2", "GPK-4"],
+    "remark": "ALRM CODE 84 故障，需要技术员登轮排查。"
+  },
+  "history_cases": [
+    {
+      "case_id": "RH-2025-0022311001",
+      "risk_description": "注意施工安全，有效跟船上沟通。备件另计",
+      "task_description": "CONSILIUM 火警系统故障检查",
+      "total_persons": 2,
+      "total_days": "1.0",
+      "personnel": [
+        {
+          "work_type_name": "电气工程师",
+          "work_type_code": "JN0001",
+          "job_level_name": "ET3",
+          "job_level_code": "ET3",
+          "quantity": 1,
+          "construction_hour": 10.0,
+          "task_desc": "CONSILIUM 火警系统故障检查"
+        },
+        {
+          "work_type_name": "电气工程师",
+          "work_type_code": "JN0001",
+          "job_level_name": "ET2",
+          "job_level_code": "ET2",
+          "quantity": 1,
+          "construction_hour": 10.0,
+          "task_desc": "CONSILIUM 火警系统故障检查"
+        }
+      ]
+    },
+    {
+      "case_id": "RH-2025-0022431001",
+      "risk_description": "有效跟客户沟通故障问题，能美的火警。",
+      "task_description": "能美火警系统故障处理",
+      "total_persons": 2,
+      "total_days": "15.0",
+      "personnel": [
+        {
+          "work_type_name": "电气工程师",
+          "work_type_code": "JN0001",
+          "job_level_name": "ET4",
+          "job_level_code": "ET4",
+          "quantity": 1,
+          "construction_hour": 12.0,
+          "task_desc": "能美火警系统故障处理"
+        },
+        {
+          "work_type_name": "电气工程师",
+          "work_type_code": "JN0001",
+          "job_level_name": "ET3",
+          "job_level_code": "ET3",
+          "quantity": 1,
+          "construction_hour": 12.0,
+          "task_desc": "能美火警系统故障处理"
+        }
+      ]
+    },
+    {
+      "case_id": "RH-2025-0009611001",
+      "risk_description": "内含船厂常规工作，工期因交叉作业、备件、船厂进出坞等因素导致延迟。",
+      "task_description": "主机常规坞修保养工作",
+      "total_persons": 9,
+      "personnel": [
+        {
+          "work_type_name": "轮机工程师",
+          "work_type_code": "JN0002",
+          "job_level_name": "MT5",
+          "job_level_code": "MT5",
+          "quantity": 2,
+          "construction_hour": 110.0,
+          "task_desc": "主机常规坞修保养工作"
+        },
+        {
+          "work_type_name": "轮机钳工",
+          "work_type_code": "JN0009",
+          "job_level_name": "FP5",
+          "job_level_code": "FP5",
+          "quantity": 1,
+          "construction_hour": 110.0,
+          "task_desc": "主机常规坞修保养工作"
+        },
+        {
+          "work_type_name": "轮机钳工",
+          "work_type_code": "JN0009",
+          "job_level_name": "FP4",
+          "job_level_code": "FP4",
+          "quantity": 1,
+          "construction_hour": 110.0,
+          "task_desc": "主机常规坞修保养工作"
+        }
+      ]
+    }
+  ]
+}
