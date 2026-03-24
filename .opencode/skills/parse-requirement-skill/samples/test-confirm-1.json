@@ -1,0 +1,24 @@
+{
+  "session_id": "sess-0d4d1cb472ed",
+  "current_requirements": [
+    {
+      "requirement_id": "REQ-001",
+      "summary": "Consilium fire alarm system fault troubleshooting",
+      "business_type": {"code": "BT002", "name": "电气"},
+      "service_desc": "消防报警系统故障排查",
+      "service_type": {"code": "ST002", "name": "维修"},
+      "equipment_name": "电气系统",
+      "equipment_model": null,
+      "equipment_manufacturer": "Consilium",
+      "equipment_quantity": 1,
+      "equipment_unit": "套",
+      "service_device_models": ["IOK-4", "AKK-2", "GPK-4"],
+      "remark": "ALRM CODE 84 故障，已更换 IOK-4/AKK-2/GPK-4 备件，但仍有报警无法消除：Pump unit abnormal, Sprinkler system release, Loop-1 cable break。需要技术员在南通登轮排查。",
+      "original_evidence": ["Dear Taylor, Please NOTE that Consilium Shanghai attended the vessel..."],
+      "ambiguities": [],
+      "confidence": "high",
+      "needs_user_confirmation": false
+    }
+  ],
+  "user_feedback": "确认需求单"
+}

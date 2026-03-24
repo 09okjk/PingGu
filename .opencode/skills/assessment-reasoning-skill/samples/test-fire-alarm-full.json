@@ -1,0 +1,95 @@
+{
+  "requirement": {
+    "requirement_id": "REQ-001",
+    "business_type": {
+      "code": "BT001",
+      "name": "电气"
+    },
+    "service_desc": {
+      "code": "RS0000001761",
+      "name": "火警系统"
+    },
+    "service_type": {
+      "code": "CS0001",
+      "name": "维修"
+    },
+    "equipment_name": "火警系统",
+    "equipment_model": null,
+    "equipment_manufacturer": "Consilium",
+    "equipment_quantity": 1,
+    "equipment_unit": "套",
+    "service_device_models": ["IOK-4", "AKK-2", "GPK-4"],
+    "remark": "ALRM CODE 84 故障，已更换 IOK-4/AKK-2/GPK-4 备件，但仍有报警无法消除：Pump unit abnormal, Sprinkler system release, Loop-1 cable break。需要技术员在南通登轮排查。"
+  },
+  "history_cases": [
+    {
+      "case_id": "RH-2025-0022311001",
+      "risk_description": "注意施工安全，有效跟船上沟通。备件另计",
+      "task_description": "CONSILIUM 火警系统故障检查",
+      "total_persons": 2,
+      "total_days": "1.0",
+      "personnel": [
+        {
+          "work_type_name": "轮机工程师",
+          "job_level_name": "高级工程师 (T5)",
+          "quantity": 1,
+          "construction_hour": "10.0",
+          "task_desc": "CONSILIUM 火警系统故障检查"
+        },
+        {
+          "work_type_name": "轮机工程师",
+          "job_level_name": "高级工程师 (T5)",
+          "quantity": 1,
+          "construction_hour": "10.0",
+          "task_desc": "CONSILIUM 火警系统故障检查"
+        }
+      ]
+    },
+    {
+      "case_id": "RH-2025-0022431001",
+      "risk_description": "有效跟客户沟通故障问题，能美的火警。",
+      "task_description": "能美火警系统故障处理",
+      "total_persons": 2,
+      "total_days": "15.0",
+      "personnel": [
+        {
+          "work_type_name": "轮机工程师",
+          "job_level_name": "高级工程师 (T5)",
+          "quantity": 1,
+          "construction_hour": "12.0",
+          "task_desc": "能美火警系统故障处理"
+        },
+        {
+          "work_type_name": "轮机工程师",
+          "job_level_name": "高级工程师 (T5)",
+          "quantity": 1,
+          "construction_hour": "12.0",
+          "task_desc": "能美火警系统故障处理"
+        }
+      ]
+    },
+    {
+      "case_id": "RH-2025-0053221001",
+      "risk_description": "注意施工安全，带好安全劳保用品",
+      "task_description": "AUTRONIC 火警故障检修",
+      "total_persons": 2,
+      "total_days": "12.0",
+      "personnel": [
+        {
+          "work_type_name": "轮机工程师",
+          "job_level_name": "高级工程师 (T5)",
+          "quantity": 1,
+          "construction_hour": "12.0",
+          "task_desc": "火警出现 BSL-10 &BLC-EQ 故障，检查 10 回路线路线路，探头、终端电阻测量，火警控制箱检查"
+        },
+        {
+          "work_type_name": "轮机工程师",
+          "job_level_name": "高级工程师 (T5)",
+          "quantity": 1,
+          "construction_hour": "12.0",
+          "task_desc": "火警出现 BSL-10 &BLC-EQ 故障，检查 10 回路线路线路，探头、终端电阻测量，火警控制箱检查"
+        }
+      ]
+    }
+  ]
+}

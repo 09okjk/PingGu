@@ -1,0 +1,9 @@
+{
+  "business_type": "电气",
+  "service_desc_code": "RS0000001761",
+  "service_type_code": "CS0001",
+  "equipment_model_code": null,
+  "task_description": "消防报警系统故障排查，ALRM CODE 84，更换 IOK-4/AKK-2/GPK-4 后仍有报警",
+  "remark": "南通港登轮",
+  "top_k": 5
+}

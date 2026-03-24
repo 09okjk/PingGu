@@ -1,0 +1,25 @@
+{
+  "requirement": {
+    "requirement_id": "REQ-001",
+    "business_type": {
+      "code": "BT002",
+      "name": "电气"
+    },
+    "service_desc": {
+      "code": "SD005",
+      "name": "电气系统"
+    },
+    "service_type": {
+      "code": "ST002",
+      "name": "维修"
+    },
+    "equipment_name": "电气系统",
+    "equipment_model": null,
+    "equipment_manufacturer": "Consilium",
+    "equipment_quantity": 1,
+    "equipment_unit": "套",
+    "service_device_models": ["IOK-4", "AKK-2", "GPK-4"],
+    "remark": "ALRM CODE 84 故障，已更换 IOK-4/AKK-2/GPK-4 备件，但仍有报警无法消除：Pump unit abnormal, Sprinkler system release, Loop-1 cable break。需要技术员在南通登轮排查。"
+  },
+  "history_cases": []
+}
