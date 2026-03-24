@@ -1,6 +1,6 @@
 # AGENTS.md - 智能评估 Agent 开发指南
 
-> 最后更新：2026-03-24 | 适用版本：S1/S2/S5
+> 最后更新：2026-03-24 | 适用版本：S1/S2/S5/S6
 
 ## 项目概述
 
@@ -30,6 +30,13 @@ cd .opencode/skills/assessment-reasoning-skill
 uv pip install psycopg2-binary  # DB 模式需要
 uv run python scripts/main.py --action reason_assessment \
   --json-input samples/sample-input.json --refs-dir references --pretty
+```
+
+### S6 - 报告生成 (Python)
+```bash
+cd .opencode/skills/generate-report-skill
+uv run python scripts/main.py --action generate_report \
+  --json-input-file samples/sample-input.json --pretty
 ```
 
 ## 数据库配置
@@ -72,6 +79,7 @@ def parse_email(email_text: str, refs: Dict[str, Any]) -> Dict[str, Any]:
 - 函数/变量：`snake_case` (`parse_email`, `risk_rules`)
 - 类：`PascalCase` (`ReferenceRepository`)
 - 常量：`UPPER_CASE` (`PINGGU_USE_DB`)
+- 私有方法/变量：`_prefix` (`_internal_cache`)
 
 **错误处理**:
 ```python
@@ -82,6 +90,21 @@ except FileNotFoundError as e:
     print(dump_json(fail("FILE_NOT_FOUND", str(e)), pretty=True))
 except Exception as e:
     print(dump_json(fail("UNEXPECTED_ERROR", str(e)), pretty=True))
+```
+
+**Docstring 规范**:
+- 所有公共函数必须包含 docstring
+- 使用三引号，首行简述功能
+- 复杂函数需说明参数和返回值
+
+**Windows 兼容性**:
+```python
+# Windows 编码修复 (main.py 开头)
+if sys.platform == "win32":
+    if hasattr(sys.stdout, "buffer"):
+        sys.stdout = io.TextIOWrapper(
+            sys.stdout.buffer, encoding="utf-8", line_buffering=True
+        )
 ```
 
 ### Node.js 规范
@@ -99,6 +122,19 @@ export async function searchHistoryCases(input) {
 }
 ```
 
+**错误处理**:
+```javascript
+try {
+  const results = await searchHistoryCases(input);
+  console.log(JSON.stringify({ success: true, data: results }));
+} catch (error) {
+  console.log(JSON.stringify({ 
+    success: false, 
+    error: { code: 'QUERY_FAILED', message: error.message } 
+  }));
+}
+```
+
 ### JSON 规范
 
 - 缩进：2 空格 | 编码：UTF-8 | 键名：`snake_case`
@@ -112,6 +148,11 @@ export async function searchHistoryCases(input) {
   "error": null
 }
 ```
+
+**输出格式**:
+- 所有 Skill 输出必须包含 `success`, `data`, `error` 字段
+- 成功时 `data` 包含结果，`error` 为 `null`
+- 失败时 `data` 为 `null`, `error` 包含 `code` 和 `message`
 
 ## 测试指南
 
@@ -129,6 +170,10 @@ cd .opencode/skills/search-history-cases-skill && npm run search
 uv run python .opencode/skills/assessment-reasoning-skill/scripts/main.py \
   --action reason_assessment --json-input samples/sample-input.json \
   --refs-dir references --pretty
+
+# S6 (Python)
+cd .opencode/skills/generate-report-skill && uv run python scripts/main.py \
+  --action generate_report --json-input-file samples/sample-input.json --pretty
 ```
 
 ### 测试检查清单
@@ -144,7 +189,8 @@ PingGu/
 ├── .opencode/skills/
 │   ├── parse-requirement-skill/     # S5
 │   ├── search-history-cases-skill/  # S1
-│   └── assessment-reasoning-skill/  # S2
+│   ├── assessment-reasoning-skill/  # S2
+│   └── generate-report-skill/       # S6
 ├── 设计方案及规范/
 └── AGENTS.md
 ```
@@ -157,6 +203,7 @@ PingGu/
 3. **目录**: `scripts/` 代码，`references/` 配置
 4. **环境变量**: 提供 `.env.example`
 5. **Windows 兼容**: UTF-8 编码处理
+6. **输出规范**: 必须包含 `confidence` 字段
 
 ## 常见问题
 
@@ -168,12 +215,6 @@ A: 检查 `.env` 配置，确认 PostgreSQL 服务运行
 
 **Q: 字段为 null**  
 A: 检查 `references/*.json` 枚举配置，添加别名
-
-## 相关文档
-
-- `.opencode/skills/*/SKILL.md` - Skill 使用说明
-- `.opencode/skills/README.md` - Skills 总览
-- `设计方案及规范/` - 详细设计文档
 
 ## 注意事项
 
