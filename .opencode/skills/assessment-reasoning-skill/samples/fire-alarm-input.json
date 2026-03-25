@@ -1,0 +1,41 @@
+{
+  "requirement": {
+    "requirement_id": "REQ-001",
+    "summary": "火警系统 / 维修",
+    "business_type": {"code": "BT002", "name": "电气"},
+    "service_desc": {"code": "RS0000001761", "name": "火警系统"},
+    "service_type": {"code": "CS0001", "name": "维修"},
+    "equipment_name": {"name": "火警系统"},
+    "equipment_model": {"name": "Consilium"},
+    "equipment_manufacturer": "Consilium",
+    "remark": "Consilium 火警系统故障：更换 IOK-4/AKK-2/GPK-4 备件后仍有多个报警无法复位（Pump unit abnormal, Sprinkler system release, Loop-1 cable break），需登轮南通排查。"
+  },
+  "history_cases": [
+    {
+      "case_id": "RH-2025-0015731001",
+      "task_description": "FIRE ALARM SYSTEM (CONSILIOUM CS400) - 更换备件并排查故障",
+      "total_persons": 2,
+      "total_days": "3.0",
+      "personnel": [
+        {
+          "work_type_code": "JN0002",
+          "work_type_name": "轮机工程师",
+          "job_level_code": "MT5",
+          "job_level_name": "高级工程师 (T5)",
+          "quantity": 1,
+          "construction_hour": "24.0"
+        },
+        {
+          "work_type_code": "JN0008",
+          "work_type_name": "安装工",
+          "job_level_code": "D5",
+          "job_level_name": "技师 (P5)",
+          "quantity": 1,
+          "construction_hour": "24.0"
+        }
+      ],
+      "tools": [{"item_name": "LDM", "quantity": 1}],
+      "materials": [{"item_name": "氧气", "item_model": "40L", "quantity": 2, "unit": "瓶"}]
+    }
+  ]
+}
