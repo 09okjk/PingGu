@@ -1,0 +1,27 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "LearningFlywheelSkillOutput",
+  "type": "object",
+  "required": ["success", "data", "error"],
+  "properties": {
+    "success": { "type": "boolean" },
+    "data": {
+      "type": ["object", "null"],
+      "properties": {
+        "skill": { "type": "string" },
+        "version": { "type": "string" },
+        "revision_diff": { "type": "array" },
+        "feedback_tags": { "type": "array" },
+        "learning_sample": { "type": "object" },
+        "rule_candidates": { "type": "array" },
+        "report_preference_candidates": { "type": "array" },
+        "next_step_actions": { "type": "array" },
+        "confidence": { "type": "string" },
+        "storage": { "type": ["object", "null"] }
+      }
+    },
+    "error": {
+      "type": ["object", "null"]
+    }
+  }
+}

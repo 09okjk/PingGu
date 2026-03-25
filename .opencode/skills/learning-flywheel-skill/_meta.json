@@ -1,0 +1,8 @@
+{
+  "name": "learning-flywheel-skill",
+  "slug": "learning-flywheel-skill",
+  "version": "1.1.0",
+  "author": "09okjk",
+  "description": "Extract revision diffs, feedback tags, learning samples, rule candidates, and report preference candidates from confirmed assessment revisions, with optional PostgreSQL storage.",
+  "entry": "scripts/main.py"
+}

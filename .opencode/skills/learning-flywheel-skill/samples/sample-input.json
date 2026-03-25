@@ -1,0 +1,172 @@
+{
+  "context": {
+    "task_id": "AT202603250001",
+    "org_id": "org_001",
+    "user_id": "u_123",
+    "business_type": "轮机",
+    "ship_type": "bulk_carrier"
+  },
+  "artifacts": {
+    "requirement_json": {
+      "requirement_id": "req-001",
+      "business_type": {
+        "code": "BT0001",
+        "name": "轮机"
+      },
+      "service_desc": {
+        "code": "RS0001",
+        "name": "二冲程柴油机"
+      },
+      "service_type": {
+        "code": "CS0017",
+        "name": "保养10年"
+      },
+      "equipment_name": {
+        "code": "EN0001",
+        "name": "主机"
+      },
+      "equipment_model": {
+        "code": "ET000826",
+        "name": "MAN B&W-9S90ME-C9.2-TII"
+      },
+      "equipment_quantity": 1,
+      "remark": "内含船厂常规工作，可能存在交叉作业与备件等待。"
+    },
+    "history_cases_json": [
+      {
+        "case_id": "RH-2025-0009611001",
+        "risk_description": "内含船厂常规工作，工期因交叉作业、备件、船厂进出坞等因素导致延迟。",
+        "task_description": "主机常规坞修保养工作",
+        "total_persons": 9
+      }
+    ],
+    "assessment_reasoning_json": {
+      "risk_results": [
+        {
+          "risk_id": "RISK-001",
+          "risk_name": "船厂交叉作业导致工期延误",
+          "risk_level": "medium",
+          "confidence": "medium"
+        }
+      ],
+      "workhour_results": [
+        {
+          "task_tag": "主机常规坞修保养工作",
+          "suggested_hours": 96,
+          "confidence": "medium"
+        }
+      ],
+      "manpower_result": {
+        "total_persons": 3,
+        "confidence": "medium"
+      }
+    },
+    "initial_report_json": {
+      "status": "ok",
+      "report_table": {
+        "risk_rows": [
+          {
+            "risk_id": "RISK-001",
+            "risk_name": "船厂交叉作业导致工期延误",
+            "risk_level": "medium",
+            "description": "现场存在交叉作业时，可能导致施工窗口受限与工期延误。"
+          }
+        ],
+        "totals": {
+          "total_hours": {
+            "value": 96
+          },
+          "total_persons": {
+            "value": 3
+          }
+        },
+        "spare_parts_or_equipment": {
+          "customer_provided": [],
+          "provider_provided": [],
+          "to_be_confirmed": []
+        }
+      },
+      "review_focus": []
+    },
+    "final_report_json": {
+      "status": "confirmed",
+      "report_table": {
+        "risk_rows": [
+          {
+            "risk_id": "RISK-001",
+            "risk_name": "船厂交叉作业导致工期延误",
+            "risk_level": "high",
+            "description": "现场存在交叉作业时，可能导致施工窗口受限与工期延误。"
+          }
+        ],
+        "totals": {
+          "total_hours": {
+            "value": 110
+          },
+          "total_persons": {
+            "value": 4
+          }
+        },
+        "spare_parts_or_equipment": {
+          "customer_provided": [],
+          "provider_provided": [],
+          "to_be_confirmed": [
+            {
+              "item_name": "专用备件包"
+            }
+          ]
+        }
+      },
+      "review_focus": [
+        "请确认备件等待是否影响工期。",
+        "请确认专用备件包由谁提供。"
+      ]
+    },
+    "conversation_messages": [
+      {
+        "role": "user",
+        "content": "风险等级偏低，另外要补充备件等待和专用备件包确认。"
+      },
+      {
+        "role": "assistant",
+        "content": "已记录：上调风险等级，并补充备件相关审核关注点。"
+      }
+    ],
+    "edit_actions": [
+      {
+        "field_path": "report_table.risk_rows[0].risk_level",
+        "action": "update",
+        "before": "medium",
+        "after": "high",
+        "source": "ui_edit"
+      },
+      {
+        "field_path": "report_table.totals.total_hours.value",
+        "action": "update",
+        "before": 96,
+        "after": 110,
+        "source": "ui_edit"
+      },
+      {
+        "field_path": "report_table.totals.total_persons.value",
+        "action": "update",
+        "before": 3,
+        "after": 4,
+        "source": "ui_edit"
+      }
+    ]
+  },
+  "versions": {
+    "s5_version": "2.0.0",
+    "s1_version": "1.0.0",
+    "s2_version": "1.1.0",
+    "s6_version": "1.0.0",
+    "prompt_version": "report_prompt_v1",
+    "references_version": "2026-03-24"
+  },
+  "options": {
+    "store_learning_sample": true,
+    "generate_rule_candidates": true,
+    "generate_preference_candidates": true
+  }
+}
