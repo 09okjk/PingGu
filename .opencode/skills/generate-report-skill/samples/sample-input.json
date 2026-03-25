@@ -123,6 +123,7 @@
   "options": {
     "output_language": "zh-CN",
     "include_source_details": true,
-    "include_review_focus": true
+    "include_review_focus": true,
+    "output_format": "markdown"
   }
 }

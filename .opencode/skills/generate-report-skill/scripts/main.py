@@ -11,6 +11,7 @@ if sys.platform == "win32":
         )
 
 from report_builder import generate_report
+from markdown_formatter import format_report_markdown
 from utils import dump_json, fail, load_json_file, ok
 
 
@@ -28,6 +29,7 @@ def load_payload(args: argparse.Namespace) -> Dict[str, Any]:
         return load_json_file(args.json_input_file)
     if args.json_input:
         import json
+
         return json.loads(args.json_input)
     raise ValueError("json-input-file or json-input is required")
 
@@ -39,10 +41,21 @@ def main() -> None:
 
         if args.action == "generate_report":
             result = generate_report(payload)
-            print(dump_json(ok(result), pretty=args.pretty))
+
+            output_format = payload.get("options", {}).get("output_format", "json")
+
+            if output_format == "markdown":
+                print(format_report_markdown(result))
+            else:
+                print(dump_json(ok(result), pretty=args.pretty))
             return
 
-        print(dump_json(fail("INVALID_ACTION", f"Unsupported action: {args.action}"), pretty=args.pretty))
+        print(
+            dump_json(
+                fail("INVALID_ACTION", f"Unsupported action: {args.action}"),
+                pretty=args.pretty,
+            )
+        )
     except FileNotFoundError as e:
         print(dump_json(fail("FILE_NOT_FOUND", str(e)), pretty=True))
     except ValueError as e:

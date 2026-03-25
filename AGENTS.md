@@ -39,6 +39,14 @@ uv run python scripts/main.py --action generate_report \
   --json-input-file samples/sample-input.json --pretty
 ```
 
+### S6 - 输出 Markdown 格式 (人类可读)
+```bash
+cd .opencode/skills/generate-report-skill
+uv run python scripts/main.py --action generate_report \
+  --json-input-file samples/sample-input.json
+```
+在输入 JSON 的 `options` 中设置 `"output_format": "markdown"` 即可输出 Markdown 格式报告。
+
 ### 运行单个测试
 ```bash
 # S5 (Python)
@@ -137,6 +145,7 @@ if sys.platform == "win32":
 - 成功时 `data` 包含结果，`error` 为 `null`
 - 失败时 `data` 为 `null`, `error` 包含 `code` 和 `message`
 - 所有输出必须包含 `confidence` 字段
+- **S6 报告生成默认输出 Markdown 格式**（人类可读），JSON 格式需显式指定 `"output_format": "json"`
 
 ## 测试检查清单
 - [ ] 输出包含 `success: true/false`

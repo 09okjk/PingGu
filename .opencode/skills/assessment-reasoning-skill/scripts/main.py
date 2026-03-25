@@ -18,12 +18,55 @@ from utils import dump_json, fail, load_json_file, ok
 from workhour_engine import estimate_workhours
 
 
+def extract_learning_signals(
+    learning_samples: List[Dict[str, Any]],
+) -> tuple[List[str], List[str]]:
+    signals: List[str] = []
+    references: List[str] = []
+
+    if not learning_samples:
+        return signals, references
+
+    risk_revisions = 0
+    spare_part_revisions = 0
+    workhour_revisions = 0
+
+    for sample in learning_samples:
+        summary = (sample.get("revision_summary") or "").lower()
+        sample_id = sample.get("sample_id", "")
+
+        if "风险" in summary and ("上调" in summary or "提高" in summary):
+            risk_revisions += 1
+            if sample_id:
+                references.append(sample_id)
+        if "备件" in summary or "等待" in summary:
+            spare_part_revisions += 1
+            if sample_id and sample_id not in references:
+                references.append(sample_id)
+        if "工时" in summary or (
+            "时间" in summary and ("增加" in summary or "延长" in summary)
+        ):
+            workhour_revisions += 1
+            if sample_id and sample_id not in references:
+                references.append(sample_id)
+
+    if risk_revisions > 0:
+        signals.append("similar_revisions_often_raise_risk_level")
+    if spare_part_revisions > 0:
+        signals.append("similar_revisions_often_add_spare_part_notes")
+    if workhour_revisions > 0:
+        signals.append("similar_revisions_often_increase_hours")
+
+    return signals, references
+
+
 def build_reasoning_trace(
     requirement: Dict[str, Any],
     history_cases: List[Dict[str, Any]],
     risk_results: List[Dict[str, Any]],
     workhour_results: List[Dict[str, Any]],
     manpower_result: Dict[str, Any],
+    learning_samples: List[Dict[str, Any]] | None = None,
 ) -> List[str]:
     trace: List[str] = []
 
@@ -46,7 +89,12 @@ def build_reasoning_trace(
         trace.append("工时估算采用历史参考值并叠加风险修正")
 
     if manpower_result:
-        trace.append("人数推理采用“可串行则复用”的简化规则")
+        trace.append("人数推理采用可串行则复用的简化规则")
+
+    if learning_samples:
+        signals, _ = extract_learning_signals(learning_samples)
+        if signals:
+            trace.append(f"学习资产提示：{','.join(signals)}")
 
     return trace
 
@@ -70,6 +118,7 @@ def summarize_confidence(
 def run_reason_assessment(payload: Dict[str, Any], refs_dir: str) -> Dict[str, Any]:
     requirement = payload.get("requirement", {})
     history_cases = payload.get("history_cases", [])
+    learning_samples = payload.get("learning_samples", [])
 
     repo = ReferenceRepository(refs_dir)
     risk_rules = repo.get_risk_rules()
@@ -91,6 +140,7 @@ def run_reason_assessment(payload: Dict[str, Any], refs_dir: str) -> Dict[str, A
         risk_results,
         workhour_results,
         manpower_result,
+        learning_samples,
     )
 
     warnings = []
@@ -101,6 +151,23 @@ def run_reason_assessment(payload: Dict[str, Any], refs_dir: str) -> Dict[str, A
     if manpower_result.get("confidence") == "low":
         warnings.append("人数推理依据较弱，建议人工复核。")
 
+    learning_signals, learning_references = extract_learning_signals(learning_samples)
+
+    if learning_signals:
+        for signal in learning_signals:
+            if "raise_risk" in signal:
+                warnings.append(
+                    "学习资产提示：类似场景中人工常上调风险等级，请重点确认。"
+                )
+            if "add_spare_part" in signal:
+                warnings.append(
+                    "学习资产提示：类似场景中人工常补充备件相关说明，请重点确认。"
+                )
+            if "increase_hours" in signal:
+                warnings.append(
+                    "学习资产提示：类似场景中人工常增加工时估算，请重点确认。"
+                )
+
     return {
         "requirement_id": requirement.get("requirement_id", "unknown"),
         "status": "ok",
@@ -110,6 +177,8 @@ def run_reason_assessment(payload: Dict[str, Any], refs_dir: str) -> Dict[str, A
         "confidence_summary": confidence_summary,
         "reasoning_trace": reasoning_trace,
         "warnings": warnings,
+        "learning_signals": learning_signals,
+        "learning_references": learning_references,
     }
 
 

@@ -1,0 +1,9 @@
+{
+  "business_type": "轮机",
+  "service_desc_code": "RS0000001761",
+  "service_type_code": "CS0001",
+  "equipment_model_code": "",
+  "task_description": "主机异常振动检查与维修",
+  "remark": "内含船厂常规工作，可能存在交叉作业与备件等待。",
+  "top_k": 3
+}

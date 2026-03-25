@@ -14,7 +14,7 @@ def dump_json(data: Any, pretty: bool = False) -> str:
     return json.dumps(data, ensure_ascii=False)
 
 
-def ok(data: Dict[str, Any]) -> Dict[str, Any]:
+def ok(data: Any) -> Dict[str, Any]:
     return {"success": True, "data": data, "error": None}
 
 

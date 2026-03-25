@@ -91,6 +91,25 @@ python3 scripts/main.py \
 | `--json-input` | `json` | 直接传入 JSON 字符串 | ❌ 与 `--json-input-file` 二选一 |
 | `--pretty` | `flag` | 格式化输出 JSON | ❌ |
 
+### 输出格式选项
+
+在输入 JSON 的 `options` 中设置 `output_format`：
+
+| 值 | 说明 | 适用场景 |
+|----|------|----------|
+| `markdown` | 输出 Markdown 格式报告（默认） | 工务人员直接阅读、对话交互 |
+| `json` | 输出 JSON 格式 | 程序调用、数据交换 |
+
+**示例**：
+```json
+{
+  "options": {
+    "output_format": "markdown",
+    "output_language": "zh-CN"
+  }
+}
+```
+
 ---
 
 ## Input Contract
@@ -114,7 +133,20 @@ python3 scripts/main.py \
 
 ## Output Contract
 
-输出对象结构：
+### Markdown 格式（默认，人类可读）
+
+```markdown
+# 评估报告草稿
+
+## 一、服务需求概要
+
+- **业务归口**: 轮机
+- **服务描述**: 火警系统
+- **服务类型**: 维修
+...
+```
+
+### JSON 格式（程序调用）
 
 ```json
 {
@@ -123,19 +155,7 @@ python3 scripts/main.py \
     "requirement_id": "req-001",
     "status": "ok",
     "report_version": "1.0.0",
-    "report_language": "zh-CN",
-    "report_type": "service_assessment_draft",
-    "report_for": [
-      "engineering_review",
-      "quotation_preparation"
-    ],
-    "summary": {},
-    "report_table": {},
-    "confidence_summary": {},
-    "source_summary": {},
-    "warnings": [],
-    "review_focus": [],
-    "metadata": {}
+    ...
   },
   "error": null
 }

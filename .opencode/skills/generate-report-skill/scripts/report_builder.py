@@ -19,6 +19,7 @@ def generate_report(payload: Dict[str, Any]) -> Dict[str, Any]:
     requirement = payload.get("requirement", {}) or {}
     history_cases = payload.get("history_cases", []) or []
     assessment_result = payload.get("assessment_result", {}) or {}
+    learning_samples = payload.get("learning_samples", []) or []
     options = payload.get("options", {}) or {}
 
     warnings: List[Dict[str, Any]] = []
@@ -46,12 +47,16 @@ def generate_report(payload: Dict[str, Any]) -> Dict[str, Any]:
         spare_parts_or_equipment,
     )
     source_summary = build_source_summary(history_cases, assessment_result)
+
+    learning_summary = build_learning_summary(learning_samples)
+
     review_focus = build_review_focus(
         risk_rows,
         task_rows,
         totals,
         spare_parts_or_equipment,
         warnings,
+        learning_samples,
         include_review_focus=options.get("include_review_focus", True),
     )
 
@@ -79,10 +84,48 @@ def generate_report(payload: Dict[str, Any]) -> Dict[str, Any]:
         "source_summary": source_summary,
         "warnings": warnings,
         "review_focus": review_focus,
+        "learning_summary": learning_summary,
         "metadata": {
             "generated_at": datetime.utcnow().isoformat() + "Z",
             "generator_version": "1.1.0",
         },
+    }
+
+
+def build_learning_summary(
+    learning_samples: List[Dict[str, Any]],
+) -> Dict[str, Any]:
+    if not learning_samples:
+        return {
+            "used_learning_sample_ids": [],
+            "applied_learning_hints": [],
+        }
+
+    sample_ids = []
+    hints = []
+
+    risk_hints = 0
+    spare_part_hints = 0
+
+    for sample in learning_samples:
+        sample_id = sample.get("sample_id", "")
+        if sample_id:
+            sample_ids.append(sample_id)
+
+        summary = sample.get("revision_summary") or ""
+        if "风险" in summary and ("上调" in summary or "提高" in summary):
+            risk_hints += 1
+        if "备件" in summary or "等待" in summary:
+            spare_part_hints += 1
+
+    if risk_hints > 0:
+        hints.append("similar_cases_often_raise_risk_level")
+    if spare_part_hints > 0:
+        hints.append("similar_cases_often_add_spare_part_confirmation")
+
+    return {
+        "used_learning_sample_ids": sample_ids,
+        "applied_learning_hints": hints,
     }
 
 
@@ -92,6 +135,7 @@ def build_review_focus(
     totals: Dict[str, Any],
     spare_parts_or_equipment: Dict[str, List[Dict[str, Any]]],
     warnings: List[Dict[str, Any]],
+    learning_samples: List[Dict[str, Any]] | None = None,
     include_review_focus: bool = True,
 ) -> List[str]:
     if not include_review_focus:
@@ -116,6 +160,16 @@ def build_review_focus(
 
     if warnings:
         focus.append("请结合 warnings 列表优先复核数据稳定性不足的字段。")
+
+    if learning_samples:
+        for sample in learning_samples:
+            summary = sample.get("revision_summary") or ""
+            if "风险" in summary and ("上调" in summary or "提高" in summary):
+                focus.append(
+                    "类似场景中人工常上调风险等级，请重点确认风险判断是否偏低。"
+                )
+            if "备件" in summary or "等待" in summary:
+                focus.append("类似场景中人工常补充备件等待影响，请重点确认。")
 
     return list(dict.fromkeys(focus))
 

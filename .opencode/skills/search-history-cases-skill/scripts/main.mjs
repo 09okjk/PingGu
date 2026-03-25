@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import fs from "fs";
 import path from "path";
-import { pool, closePool } from "./db.mjs";
+import { pool, closePool, fetchLearningSamples } from "./db.mjs";
 
 function parseArgs(argv) {
   const args = { pretty: false, topk: undefined, threshold: undefined };
@@ -22,20 +22,29 @@ function validateInput(input) {
 
 function buildMatchReason(c, req, relaxed) {
   const parts = [];
-  parts.push(`业务归口(${c.business_type || "-"})`);
-  parts.push(`服务描述(${c.service_desc_name || req.service_desc_code})`);
+  parts.push(`业务归口 (${c.business_type || "-"})`);
+  parts.push(`服务描述 (${c.service_desc_name || req.service_desc_code})`);
 
-  if (c.service_type_name) parts.push(`服务类型(${c.service_type_name})`);
-  else parts.push("服务类型(NULL兼容)");
+  if (c.service_type_name) parts.push(`服务类型 (${c.service_type_name})`);
+  else parts.push("服务类型 (NULL 兼容)");
 
   if (req.equipment_model_code && c.equipment_model_code === req.equipment_model_code) {
-    parts.push(`设备型号命中(${c.equipment_model_name || c.equipment_model_code})`);
+    parts.push(`设备型号命中 (${c.equipment_model_name || c.equipment_model_code})`);
   }
 
-  const tail = [`任务相似度: ${Number(c.task_sim_score || 0).toFixed(3)}`];
+  const tail = [`任务相似度：${Number(c.task_sim_score || 0).toFixed(3)}`];
   if (relaxed) tail.push("⚠️ 服务类型条件已放宽");
 
   return `命中：${parts.join(" + ")} | ${tail.join(" | ")}`;
+}
+
+function buildScenarioMatchReason(scenario, req) {
+  const parts = [];
+  if (scenario?.business_type) parts.push(`业务归口 (${scenario.business_type})`);
+  if (scenario?.service_desc_code) parts.push(`服务描述 (${scenario.service_desc_code})`);
+  if (scenario?.service_type_code) parts.push(`服务类型 (${scenario.service_type_code})`);
+  else parts.push("服务类型");
+  return `命中：${parts.join(" + ")}`;
 }
 
 async function queryCandidates(req, withServiceType, limit = 20) {
@@ -172,6 +181,7 @@ async function run() {
 
   const personnelMap = await fetchPersonnel(ids);
   const remarkScoreMap = await fetchRemarkScores(ids, req.remark ?? null);
+  const learningSamples = await fetchLearningSamples(req, 10);
 
   const result = topCases.map(c => ({
     case_id: c.service_order_no,
@@ -208,7 +218,15 @@ async function run() {
     candidate_count: candidates.length,
     returned_count: result.length,
     service_type_relaxed: relaxed,
-    results: result
+    results: result,
+    learning_samples: learningSamples.map(s => ({
+      sample_id: s.sample_id,
+      scenario_match_reason: buildScenarioMatchReason(s.scenario, req),
+      quality_score: s.quality_score,
+      revision_summary: s.revision_summary,
+      source_task_id: s.source_task_id,
+      status: s.status
+    }))
   };
 
   console.log(args.pretty ? JSON.stringify(output, null, 2) : JSON.stringify(output));
