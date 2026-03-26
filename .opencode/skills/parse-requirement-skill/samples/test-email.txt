@@ -1,0 +1,24 @@
+Dear Taylor,
+ 
+Please NOTE that Consilium Shanghai attended the vessel and changed below spares for taking out the ALRM CODE 84.
+1.         IOK-4
+2.         AKK-2
+3.         GPK-4
+ 
+After replacing the above the panel was switched on and found the following alarms came:
+1.         False definition.
+2.         Section detector -3
+3.         Section 7 manual call point.
+4.         Rectifier main fault
+5.         Loop-3 Cable break
+6.         Section 1 section unit missing.
+However all the above all the alarms was reset except Loop-3 cable fault. The following alarms came and couldn't reset
+1.         Pump unit abnormal
+2.         Sprinkler system release.
+3.         Loop-1 cable break
+The technician investigated the problem and was concentrating on pump unit, sprinkler panel and all section detectors. But still couldn't find out the source or solution to rectify the above alarms. 
+ 
+We need your Technician to go on-board in Nantong and rectify the fault.
+ 
+Best regards,
+Amol

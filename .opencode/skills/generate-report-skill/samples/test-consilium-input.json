@@ -1,0 +1,110 @@
+{
+  "requirement": {
+    "requirement_id": "REQ-001",
+    "business_type": {
+      "code": "BT001",
+      "name": "轮机"
+    },
+    "service_desc": {
+      "code": "RS0000001761",
+      "name": "火警系统"
+    },
+    "service_type": {
+      "code": "CS0001",
+      "name": "维修"
+    },
+    "service_location_type": {
+      "code": "SL001",
+      "name": "港口"
+    },
+    "equipment_name": {
+      "code": "EN0001",
+      "name": "火警系统"
+    },
+    "equipment_model": {
+      "code": null,
+      "name": "Consilium ALRM CODE 84"
+    },
+    "equipment_manufacturer": "Consilium",
+    "equipment_quantity": 1,
+    "equipment_unit": {
+      "code": "UM0005",
+      "name": "套"
+    },
+    "remark": "Consilium Shanghai 已更换备件但仍有多个报警无法复位，需要技术人员登轮排查",
+    "requirement_detail": "经与客户机务确认：1. 客户希望安排资深电气工程师登轮；2. 需要自备 Consilium 专用调试电脑和软件；3. 预计需要 2 天排查时间；4. 客户可协助提供部分常用备件",
+    "original_evidence": []
+  },
+  "history_cases": [
+    {
+      "case_id": "RH-2025-0008561002",
+      "task_description": "火警系统故障排查",
+      "personnel": [
+        {
+          "work_type_code": "JN0015",
+          "work_type_name": "电气工程师",
+          "job_level_code": "MT5",
+          "job_level_name": "高级工程师 (T5)",
+          "quantity": 1,
+          "construction_hour": 16.0,
+          "task_desc": "火警系统故障排查"
+        },
+        {
+          "work_type_code": "JN0009",
+          "work_type_name": "电工",
+          "job_level_code": "D4",
+          "job_level_name": "技工 (P4)",
+          "quantity": 1,
+          "construction_hour": 16.0,
+          "task_desc": "火警系统故障排查"
+        }
+      ],
+      "tools": [],
+      "materials": [],
+      "special_tools": []
+    }
+  ],
+  "assessment_result": {
+    "risk_results": [
+      {
+        "risk_id": "RISK-001",
+        "risk_name": "故障根源未明导致多次登轮",
+        "risk_level": "high",
+        "confidence": "high",
+        "trigger_basis": [
+          "remark_keyword:已更换备件但仍报警",
+          "multiple_alarms:true"
+        ],
+        "description": "客户已自行更换备件但仍有多个报警无法复位，可能存在隐蔽故障点，建议预留充分排查时间。",
+        "suggested_action": "建议安排资深电气工程师登轮，并准备充足备件。"
+      }
+    ],
+    "workhour_results": [
+      {
+        "task_tag": "火警系统故障排查",
+        "suggested_hours": 16,
+        "confidence": "medium",
+        "basis": [
+          "history_case_avg",
+          "risk_adjustment:复杂故障"
+        ],
+        "note": "基于历史案例平均值，考虑复杂故障适当上调。"
+      }
+    ],
+    "manpower_result": {
+      "total_persons": 2,
+      "confidence": "medium",
+      "basis": [
+        "history_case_match:true",
+        "job_level_cover:true"
+      ],
+      "explanation": "参考历史案例，需要 1 名电气工程师和 1 名电工配合。"
+    }
+  },
+  "options": {
+    "output_language": "zh-CN",
+    "include_source_details": true,
+    "include_review_focus": true,
+    "output_format": "markdown"
+  }
+}

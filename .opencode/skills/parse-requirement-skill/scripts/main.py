@@ -58,11 +58,13 @@ def normalize_text(text: str) -> str:
 
 
 def split_sentences(text: str) -> List[str]:
-    parts = re.split(r'(?<=[\.\!\?\n。！？；;])\s+', text)
+    parts = re.split(r"(?<=[\.\!\?\n。！？；;])\s+", text)
     return [p.strip() for p in parts if p.strip()]
 
 
-def find_best_enum_match(text: str, items: List[Dict[str, Any]]) -> Tuple[Optional[Dict[str, Any]], List[Dict[str, Any]]]:
+def find_best_enum_match(
+    text: str, items: List[Dict[str, Any]]
+) -> Tuple[Optional[Dict[str, Any]], List[Dict[str, Any]]]:
     lower_text = text.lower()
     scored = []
 
@@ -86,7 +88,11 @@ def find_best_enum_match(text: str, items: List[Dict[str, Any]]) -> Tuple[Option
     return scored[0][1], [x[1] for x in scored[:3]]
 
 
-def infer_business_type(service_desc: Optional[Dict[str, Any]], equipment_name: Optional[Dict[str, Any]], refs: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+def infer_business_type(
+    service_desc: Optional[Dict[str, Any]],
+    equipment_name: Optional[Dict[str, Any]],
+    refs: Dict[str, Any],
+) -> Optional[Dict[str, Any]]:
     mapping = refs.get("business_type_inference", {})
     bt_enum = refs.get("business_type_enum", [])
 
@@ -101,11 +107,7 @@ def infer_business_type(service_desc: Optional[Dict[str, Any]], equipment_name: 
 
     for item in bt_enum:
         if item.get("code") == candidate_code:
-            return {
-                "code": item["code"],
-                "name": item["name"],
-                "confidence": "medium"
-            }
+            return {"code": item["code"], "name": item["name"], "confidence": "medium"}
     return None
 
 
@@ -127,10 +129,12 @@ def extract_manufacturer(text: str) -> Optional[str]:
     return None
 
 
-def extract_quantity_and_unit(text: str, refs: Dict[str, Any]) -> Tuple[Optional[float], Optional[Dict[str, Any]]]:
+def extract_quantity_and_unit(
+    text: str, refs: Dict[str, Any]
+) -> Tuple[Optional[float], Optional[Dict[str, Any]]]:
     patterns = [
-        r'(\d+(?:\.\d+)?)\s*(units?|sets?|pcs?|pieces?)\b',
-        r'(\d+(?:\.\d+)?)\s*(台|套|个)\b'
+        r"(\d+(?:\.\d+)?)\s*(units?|sets?|pcs?|pieces?)\b",
+        r"(\d+(?:\.\d+)?)\s*(台|套|个)\b",
     ]
 
     matched_qty = None
@@ -152,7 +156,7 @@ def extract_quantity_and_unit(text: str, refs: Dict[str, Any]) -> Tuple[Optional
             return matched_qty, {
                 "code": item["code"],
                 "name": item["name"],
-                "confidence": "medium"
+                "confidence": "medium",
             }
 
     return matched_qty, None
@@ -163,24 +167,32 @@ def summarize_segment(segment: str) -> str:
     return s if len(s) <= 60 else s[:57] + "..."
 
 
-def build_enum_value(item: Optional[Dict[str, Any]], confidence: str = "high") -> Optional[Dict[str, Any]]:
+def build_enum_value(
+    item: Optional[Dict[str, Any]], confidence: str = "high"
+) -> Optional[Dict[str, Any]]:
     if not item:
         return None
     return {
         "code": item.get("code"),
         "name": item.get("name"),
-        "confidence": confidence
+        "confidence": confidence,
     }
 
 
-def detect_service_type_ambiguity(matched_candidates: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+def detect_service_type_ambiguity(
+    matched_candidates: List[Dict[str, Any]],
+) -> List[Dict[str, Any]]:
     if len(matched_candidates) < 2:
         return []
-    return [{
-        "field": "service_type",
-        "reason": "文本中可能同时包含多个服务动作关键词，无法完全确定单一服务类型",
-        "candidates": [{"code": c["code"], "name": c["name"]} for c in matched_candidates[:3]]
-    }]
+    return [
+        {
+            "field": "service_type",
+            "reason": "文本中可能同时包含多个服务动作关键词，无法完全确定单一服务类型",
+            "candidates": [
+                {"code": c["code"], "name": c["name"]} for c in matched_candidates[:3]
+            ],
+        }
+    ]
 
 
 def split_into_requirement_segments(text: str, refs: Dict[str, Any]) -> List[str]:
@@ -201,8 +213,12 @@ def split_into_requirement_segments(text: str, refs: Dict[str, Any]) -> List[str
         should_start_new = False
         if current and desc_match:
             current_text = " ".join(current)
-            current_desc_match, _ = find_best_enum_match(current_text, service_desc_enum)
-            if current_desc_match and current_desc_match.get("code") != desc_match.get("code"):
+            current_desc_match, _ = find_best_enum_match(
+                current_text, service_desc_enum
+            )
+            if current_desc_match and current_desc_match.get("code") != desc_match.get(
+                "code"
+            ):
                 should_start_new = True
 
         if current and any(k in sent_lower for k in split_keywords):
@@ -222,10 +238,18 @@ def split_into_requirement_segments(text: str, refs: Dict[str, Any]) -> List[str
     return merged if merged else [text]
 
 
-def parse_requirement_segment(segment: str, refs: Dict[str, Any], idx: int, strict: bool = False) -> Dict[str, Any]:
-    service_desc_match, service_desc_candidates = find_best_enum_match(segment, refs.get("service_desc_enum", []))
-    service_type_match, service_type_candidates = find_best_enum_match(segment, refs.get("service_type_enum", []))
-    equipment_name_match, _ = find_best_enum_match(segment, refs.get("equipment_name_enum", []))
+def parse_requirement_segment(
+    segment: str, refs: Dict[str, Any], idx: int, strict: bool = False
+) -> Dict[str, Any]:
+    service_desc_match, service_desc_candidates = find_best_enum_match(
+        segment, refs.get("service_desc_enum", [])
+    )
+    service_type_match, service_type_candidates = find_best_enum_match(
+        segment, refs.get("service_type_enum", [])
+    )
+    equipment_name_match, _ = find_best_enum_match(
+        segment, refs.get("equipment_name_enum", [])
+    )
 
     business_type = infer_business_type(service_desc_match, equipment_name_match, refs)
     model = extract_model(segment, refs)
@@ -256,19 +280,28 @@ def parse_requirement_segment(segment: str, refs: Dict[str, Any], idx: int, stri
         "requirement_id": f"REQ-{idx:03d}",
         "summary": " / ".join(summary_parts),
         "business_type": business_type,
-        "service_desc": build_enum_value(service_desc_match, "high" if service_desc_match else "low"),
-        "service_type": build_enum_value(service_type_match, "medium" if service_type_match else "low"),
-        "equipment_name": build_enum_value(equipment_name_match, "medium" if equipment_name_match else "low"),
-        "equipment_model": {"code": None, "name": model, "confidence": "medium"} if model else None,
+        "service_desc": build_enum_value(
+            service_desc_match, "high" if service_desc_match else "low"
+        ),
+        "service_type": build_enum_value(
+            service_type_match, "medium" if service_type_match else "low"
+        ),
+        "equipment_name": build_enum_value(
+            equipment_name_match, "medium" if equipment_name_match else "low"
+        ),
+        "equipment_model": {"code": None, "name": model, "confidence": "medium"}
+        if model
+        else None,
         "equipment_manufacturer": extract_manufacturer(segment),
         "equipment_quantity": qty,
         "equipment_unit": unit,
         "service_device_models": [model] if model else [],
         "remark": segment.strip(),
+        "requirement_detail": None,
         "original_evidence": [segment],
         "ambiguities": ambiguities,
         "confidence": confidence,
-        "needs_user_confirmation": needs_confirmation
+        "needs_user_confirmation": needs_confirmation,
     }
 
 
@@ -276,14 +309,20 @@ def build_next_questions(requirements: List[Dict[str, Any]]) -> List[str]:
     questions = []
 
     if len(requirements) > 1:
-        questions.append(f"我识别出 {len(requirements)} 个服务项，是否正确？是否需要新增、删除、合并或拆分？")
+        questions.append(
+            f"我识别出 {len(requirements)} 个服务项，是否正确？是否需要新增、删除、合并或拆分？"
+        )
 
     for req in requirements:
         rid = req.get("requirement_id")
         if req.get("service_desc") is None:
-            questions.append(f"{rid} 的服务描述尚未识别，请确认该服务项对应的设备/服务对象。")
+            questions.append(
+                f"{rid} 的服务描述尚未识别，请确认该服务项对应的设备/服务对象。"
+            )
         if req.get("service_type") is None:
-            questions.append(f"{rid} 的服务类型尚未识别，请确认是检测、维修、更换、安装还是保养。")
+            questions.append(
+                f"{rid} 的服务类型尚未识别，请确认是检测、维修、更换、安装还是保养。"
+            )
         if req.get("needs_user_confirmation"):
             questions.append(f"请确认 {rid} 的内容是否准确：{req.get('summary', '')}")
 
@@ -293,7 +332,12 @@ def build_next_questions(requirements: List[Dict[str, Any]]) -> List[str]:
     return questions[:5]
 
 
-def parse_action(payload: Dict[str, Any], refs: Dict[str, Any], forced_lang: Optional[str], strict: bool) -> Dict[str, Any]:
+def parse_action(
+    payload: Dict[str, Any],
+    refs: Dict[str, Any],
+    forced_lang: Optional[str],
+    strict: bool,
+) -> Dict[str, Any]:
     email_text = normalize_text((payload.get("email_text") or "").strip())
     if not email_text:
         raise ValueError("email_text is empty.")
@@ -304,11 +348,17 @@ def parse_action(payload: Dict[str, Any], refs: Dict[str, Any], forced_lang: Opt
     language = detect_language(email_text, forced_lang or payload.get("language_hint"))
 
     segments = split_into_requirement_segments(email_text, refs)
-    requirements = [parse_requirement_segment(seg, refs, idx=i + 1, strict=strict) for i, seg in enumerate(segments)]
+    requirements = [
+        parse_requirement_segment(seg, refs, idx=i + 1, strict=strict)
+        for i, seg in enumerate(segments)
+    ]
 
     next_questions = build_next_questions(requirements)
     status = "needs_confirmation"
-    if all(not r.get("needs_user_confirmation", False) for r in requirements) and len(next_questions) == 1:
+    if (
+        all(not r.get("needs_user_confirmation", False) for r in requirements)
+        and len(next_questions) == 1
+    ):
         status = "draft"
 
     parsing_notes = []
@@ -327,21 +377,22 @@ def parse_action(payload: Dict[str, Any], refs: Dict[str, Any], forced_lang: Opt
         "next_questions": next_questions,
         "revision_history": [],
         "parsing_notes": parsing_notes,
-        "metadata": metadata
+        "metadata": metadata,
     }
 
 
-def apply_feedback_to_requirements(requirements: List[Dict[str, Any]], feedback: str, refs: Dict[str, Any]) -> List[Dict[str, Any]]:
+def apply_feedback_to_requirements(
+    requirements: List[Dict[str, Any]], feedback: str, refs: Dict[str, Any]
+) -> List[Dict[str, Any]]:
     feedback_lower = feedback.lower()
 
-    # 简易规则：识别“第X项”“REQ-00X”“改成更换/维修/检测”等
     target_index = None
 
-    m_req = re.search(r'req[-\s]?0*([1-9]\d*)', feedback_lower)
+    m_req = re.search(r"req[-\s]?0*([1-9]\d*)", feedback_lower)
     if m_req:
         target_index = int(m_req.group(1)) - 1
 
-    m_cn = re.search(r'第\s*([1-9]\d*)\s*项', feedback)
+    m_cn = re.search(r"第\s*([1-9]\d*)\s*项", feedback)
     if m_cn:
         target_index = int(m_cn.group(1)) - 1
 
@@ -360,25 +411,54 @@ def apply_feedback_to_requirements(requirements: List[Dict[str, Any]], feedback:
             req["service_type"] = {
                 "code": service_type_target["code"],
                 "name": service_type_target["name"],
-                "confidence": "high"
+                "confidence": "high",
             }
             req["summary"] = rebuild_summary(req)
             req["confidence"] = "high"
             req["needs_user_confirmation"] = False
             req["ambiguities"] = []
         else:
-            # 未指定项时，尝试更新最后一个待确认项
             for req in reversed(updated):
                 if req.get("needs_user_confirmation", False):
                     req["service_type"] = {
                         "code": service_type_target["code"],
                         "name": service_type_target["name"],
-                        "confidence": "high"
+                        "confidence": "high",
                     }
                     req["summary"] = rebuild_summary(req)
                     req["confidence"] = "high"
                     req["needs_user_confirmation"] = False
                     req["ambiguities"] = []
+                    break
+
+    detail_keywords = [
+        "需求详情",
+        "补充信息",
+        "另外",
+        "经确认",
+        "客户反馈",
+        "detail",
+        "补充",
+    ]
+    if any(kw in feedback_lower for kw in detail_keywords):
+        detail_text = feedback
+        for kw in [
+            "需求详情:",
+            "需求详情：",
+            "补充信息:",
+            "补充信息：",
+            "detail:",
+            "detail:",
+        ]:
+            if kw in feedback:
+                detail_text = feedback.split(kw, 1)[1].strip()
+                break
+        if target_index is not None and 0 <= target_index < len(updated):
+            updated[target_index]["requirement_detail"] = detail_text
+        else:
+            for req in reversed(updated):
+                if req.get("needs_user_confirmation", False) or req == updated[-1]:
+                    req["requirement_detail"] = detail_text
                     break
 
     return updated
@@ -408,16 +488,21 @@ def revise_action(payload: Dict[str, Any], refs: Dict[str, Any]) -> Dict[str, An
     if not user_feedback:
         raise ValueError("user_feedback is required for revise.")
 
-    updated_requirements = apply_feedback_to_requirements(current_requirements, user_feedback, refs)
+    updated_requirements = apply_feedback_to_requirements(
+        current_requirements, user_feedback, refs
+    )
 
-    revision_history = revision_history + [{
-        "turn": len(revision_history) + 1,
-        "user_feedback": user_feedback
-    }]
+    revision_history = revision_history + [
+        {"turn": len(revision_history) + 1, "user_feedback": user_feedback}
+    ]
 
     next_questions = build_next_questions(updated_requirements)
     status = "needs_confirmation"
-    if "确认" in user_feedback or "可以了" in user_feedback or "无需修改" in user_feedback:
+    if (
+        "确认" in user_feedback
+        or "可以了" in user_feedback
+        or "无需修改" in user_feedback
+    ):
         status = "confirmed"
         next_questions = []
     elif all(not r.get("needs_user_confirmation", False) for r in updated_requirements):
@@ -430,7 +515,7 @@ def revise_action(payload: Dict[str, Any], refs: Dict[str, Any]) -> Dict[str, An
         "requirements": updated_requirements,
         "next_questions": next_questions,
         "revision_history": revision_history,
-        "metadata": metadata
+        "metadata": metadata,
     }
 
 
@@ -447,10 +532,9 @@ def confirm_action(payload: Dict[str, Any]) -> Dict[str, Any]:
         raise ValueError("current_requirements is required for confirm.")
 
     if user_feedback:
-        revision_history = revision_history + [{
-            "turn": len(revision_history) + 1,
-            "user_feedback": user_feedback
-        }]
+        revision_history = revision_history + [
+            {"turn": len(revision_history) + 1, "user_feedback": user_feedback}
+        ]
 
     return {
         "session_id": session_id,
@@ -459,7 +543,7 @@ def confirm_action(payload: Dict[str, Any]) -> Dict[str, Any]:
         "requirements": current_requirements,
         "next_questions": [],
         "revision_history": revision_history,
-        "metadata": metadata
+        "metadata": metadata,
     }
 
 
@@ -476,7 +560,7 @@ def read_payload(args: argparse.Namespace) -> Dict[str, Any]:
             "attachments": [],
             "language_hint": args.lang,
             "strict": args.strict,
-            "metadata": {}
+            "metadata": {},
         }
 
     if args.input_file:
@@ -486,7 +570,7 @@ def read_payload(args: argparse.Namespace) -> Dict[str, Any]:
                 "attachments": [],
                 "language_hint": args.lang,
                 "strict": args.strict,
-                "metadata": {}
+                "metadata": {},
             }
 
     if not sys.stdin.isatty():
@@ -504,7 +588,7 @@ def read_payload(args: argparse.Namespace) -> Dict[str, Any]:
             "attachments": [],
             "language_hint": args.lang,
             "strict": args.strict,
-            "metadata": {}
+            "metadata": {},
         }
 
     raise ValueError("No input provided.")
@@ -512,7 +596,9 @@ def read_payload(args: argparse.Namespace) -> Dict[str, Any]:
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="ParseRequirementSkill v2")
-    parser.add_argument("--action", required=True, choices=["parse", "revise", "confirm"])
+    parser.add_argument(
+        "--action", required=True, choices=["parse", "revise", "confirm"]
+    )
     parser.add_argument("--input", help="Raw email text")
     parser.add_argument("--input-file", help="Path to raw input text file")
     parser.add_argument("--json-input", help="Full JSON input payload")

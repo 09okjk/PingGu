@@ -1,0 +1,154 @@
+{
+  "requirement": {
+    "requirement_id": "REQ-002",
+    "business_type": {
+      "code": "BT001",
+      "name": "轮机"
+    },
+    "service_desc": {
+      "code": "RS0000000001",
+      "name": "二冲程柴油机"
+    },
+    "service_type": {
+      "code": "CS0001",
+      "name": "维修"
+    },
+    "service_location_type": {
+      "code": "SL001",
+      "name": "港口"
+    },
+    "equipment_name": {
+      "code": "EN0001",
+      "name": "主机"
+    },
+    "equipment_model": {
+      "code": "ET000826",
+      "name": "MAN B&W 6S60ME-C8.2-TII"
+    },
+    "equipment_manufacturer": "MAN B&W",
+    "equipment_quantity": 1,
+    "equipment_unit": {
+      "code": "UM0005",
+      "name": "台"
+    },
+    "remark": "主机第 3 缸排气阀执行器异常，负荷波动时出现振动，需要检查更换",
+    "requirement_detail": "经与轮机长确认：1. 故障发生在 75% 负荷以上；2. 第 3 缸排气温度偏高约 30°C；3. 需要携带专用液压工具；4. 船厂可提供辅助吊车支持"
+  },
+  "history_cases": [
+    {
+      "case_id": "RH-2024-0007231005",
+      "task_description": "主机排气阀执行器维修",
+      "personnel": [
+        {
+          "work_type_code": "JN0002",
+          "work_type_name": "轮机工程师",
+          "job_level_code": "MT5",
+          "job_level_name": "高级工程师 (T5)",
+          "quantity": 1,
+          "construction_hour": 24.0,
+          "task_desc": "主机排气阀执行器维修"
+        },
+        {
+          "work_type_code": "JN0008",
+          "work_type_name": "安装工",
+          "job_level_code": "D5",
+          "job_level_name": "技师 (P5)",
+          "quantity": 2,
+          "construction_hour": 24.0,
+          "task_desc": "主机排气阀执行器维修"
+        }
+      ],
+      "tools": [
+        {
+          "toolName": "液压拉伸器",
+          "toolType": 4,
+          "quantity": 1,
+          "unitMeasurement": {"no": "UM0005", "zhName": "套"}
+        },
+        {
+          "toolName": "扭矩扳手",
+          "toolType": 4,
+          "quantity": 2,
+          "unitMeasurement": {"no": "UM0005", "zhName": "把"}
+        }
+      ],
+      "materials": [
+        {
+          "toolName": "液压油",
+          "model": "ISO VG46",
+          "quantity": 10,
+          "unitMeasurement": {"no": "UM0010", "zhName": "升"}
+        },
+        {
+          "toolName": "清洁剂",
+          "model": "CRC-0202",
+          "quantity": 5,
+          "unitMeasurement": {"no": "UM0018", "zhName": "瓶"}
+        }
+      ],
+      "special_tools": [
+        {
+          "toolName": "排气阀专用拆装工具",
+          "model": "MAN-BW-ETV-001",
+          "quantity": 1,
+          "unitMeasurement": {"no": "UM0005", "zhName": "套"}
+        }
+      ]
+    }
+  ],
+  "assessment_result": {
+    "risk_results": [
+      {
+        "risk_id": "RISK-002",
+        "risk_name": "主机吊缸作业空间受限",
+        "risk_level": "medium",
+        "confidence": "high",
+        "trigger_basis": [
+          "equipment_name:主机",
+          "task_type:排气阀维修"
+        ],
+        "description": "机舱空间受限，吊装作业需注意安全防护。",
+        "suggested_action": "建议提前确认吊装方案，准备安全绳和防护垫。"
+      },
+      {
+        "risk_id": "RISK-003",
+        "risk_name": "液压系统泄漏风险",
+        "risk_level": "low",
+        "confidence": "medium",
+        "trigger_basis": [
+          "remark_keyword:液压",
+          "tool_required:液压拉伸器"
+        ],
+        "description": "液压工具使用不当可能导致泄漏或人员伤害。",
+        "suggested_action": "使用前检查液压管路，佩戴防护手套和护目镜。"
+      }
+    ],
+    "workhour_results": [
+      {
+        "task_tag": "主机排气阀执行器维修",
+        "suggested_hours": 24,
+        "confidence": "high",
+        "basis": [
+          "history_case_avg",
+          "r5_rule:WH-002"
+        ],
+        "note": "基于历史案例平均值，同型号主机排气阀维修标准工时。"
+      }
+    ],
+    "manpower_result": {
+      "total_persons": 3,
+      "confidence": "high",
+      "basis": [
+        "history_case_match:true",
+        "job_level_cover:true"
+      ],
+      "explanation": "参考历史案例，需要 1 名轮机工程师和 2 名安装工配合。"
+    }
+  },
+  "options": {
+    "output_language": "zh-CN",
+    "include_source_details": true,
+    "include_review_focus": true,
+    "output_format": "markdown"
+  }
+}

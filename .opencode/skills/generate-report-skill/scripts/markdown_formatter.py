@@ -4,13 +4,23 @@ from typing import Any, Dict, List, Optional
 def format_report_markdown(report: Dict[str, Any]) -> str:
     """
     将 S6 报告数据转换为 Markdown 格式，供工务人员直接阅读。
+    报告结构：
+    - 板块一：项目信息
+    - 板块二：服务评估
     """
     lines = []
 
-    lines.append("# 评估报告草稿")
+    lines.append("# 智能评估报告")
     lines.append("")
 
-    lines.extend(_build_summary_section(report.get("summary", {})))
+    # 板块一：项目信息
+    lines.append("## 项目信息")
+    lines.append("")
+    lines.extend(_build_project_info_section(report.get("summary", {})))
+
+    # 板块二：服务评估
+    lines.append("## 服务评估")
+    lines.append("")
     lines.extend(
         _build_risk_section(report.get("report_table", {}).get("risk_rows", []))
     )
@@ -18,65 +28,73 @@ def format_report_markdown(report: Dict[str, Any]) -> str:
         _build_task_section(report.get("report_table", {}).get("task_rows", []))
     )
     lines.extend(
-        _build_totals_section(report.get("report_table", {}).get("totals", {}))
+        _build_workforce_section(report.get("report_table", {}).get("task_rows", []))
     )
     lines.extend(
-        _build_tools_section(
+        _build_summary_totals_section(report.get("report_table", {}).get("totals", {}))
+    )
+    lines.extend(
+        _build_resources_section(
             report.get("report_table", {}).get("tool_rows", []),
             report.get("report_table", {}).get("material_rows", []),
             report.get("report_table", {}).get("special_tool_rows", []),
+            report.get("report_table", {}).get("spare_parts_or_equipment", {}),
         )
     )
-    lines.extend(
-        _build_spare_parts_section(
-            report.get("report_table", {}).get("spare_parts_or_equipment", {})
-        )
-    )
-    lines.extend(_build_confidence_section(report.get("confidence_summary", {})))
     lines.extend(
         _build_review_focus_section(
             report.get("review_focus", []), report.get("warnings", [])
         )
     )
-    lines.extend(_build_learning_section(report.get("learning_summary", {})))
 
     return "\n".join(lines)
 
 
-def _build_summary_section(summary: Dict[str, Any]) -> List[str]:
+def _build_project_info_section(summary: Dict[str, Any]) -> List[str]:
+    """板块一：项目信息"""
     lines = []
-    lines.append("## 一、服务需求概要")
-    lines.append("")
 
     if not summary:
-        lines.append("*暂无概要信息*")
+        lines.append("*暂无项目信息*")
         lines.append("")
         return lines
 
-    lines.append(f"- **业务归口**: {summary.get('business_type', {}).get('name', '-')}")
-    lines.append(f"- **服务描述**: {summary.get('service_desc', {}).get('name', '-')}")
-    lines.append(f"- **服务类型**: {summary.get('service_type', {}).get('name', '-')}")
+    def get_value(field: str, default: str = "-") -> str:
+        val = summary.get(field)
+        if val is None:
+            return default
+        if isinstance(val, dict):
+            return val.get("name", default) or default
+        return str(val) if val != "" else default
+
+    lines.append("| 字段 | 内容 |")
+    lines.append("|------|------|")
+    lines.append(f"| 业务归口 | {get_value('business_type')} |")
+    lines.append(f"| 服务描述 | {get_value('service_desc')} |")
+    lines.append(f"| 服务类型 | {get_value('service_type')} |")
+    lines.append(f"| 服务地点 | {get_value('service_location_type')} |")
+    lines.append(f"| 所属设备名称 | {get_value('equipment_name')} |")
+    lines.append(f"| 所属设备型号 | {get_value('equipment_model')} |")
+    lines.append(f"| 所属设备厂家 | {summary.get('equipment_manufacturer') or '-'} |")
     lines.append(
-        f"- **服务地点**: {summary.get('service_location_type', {}).get('name', '-')}"
+        f"| 服务设备数量 | {summary.get('equipment_quantity') if summary.get('equipment_quantity') is not None else '-'} |"
     )
+    lines.append(f"| 服务设备计量单位 | {get_value('equipment_unit')} |")
 
-    equipment = summary.get("equipment_name", {}).get("name", "-")
-    model = summary.get("equipment_model", {}).get("name", "-")
-    qty = summary.get("equipment_quantity", "-")
-    unit = summary.get("equipment_unit", {}).get("name", "-")
-    lines.append(f"- **设备信息**: {equipment} / {model} / {qty} {unit}")
+    remark = summary.get("remark")
+    lines.append(f"| 备注 | {remark if remark else '-'} |")
 
-    remark = summary.get("remark_summary", "")
-    if remark:
-        lines.append(f"- **备注说明**: {remark}")
+    requirement_detail = summary.get("requirement_detail")
+    lines.append(f"| 需求详情 | {requirement_detail if requirement_detail else '无'} |")
 
     lines.append("")
     return lines
 
 
 def _build_risk_section(risk_rows: List[Dict[str, Any]]) -> List[str]:
+    """4.1 风险提示"""
     lines = []
-    lines.append("## 二、风险评估")
+    lines.append("### 风险提示")
     lines.append("")
 
     if not risk_rows:
@@ -101,8 +119,9 @@ def _build_risk_section(risk_rows: List[Dict[str, Any]]) -> List[str]:
 
 
 def _build_task_section(task_rows: List[Dict[str, Any]]) -> List[str]:
+    """4.2 施工任务"""
     lines = []
-    lines.append("## 三、施工任务")
+    lines.append("### 施工任务")
     lines.append("")
 
     if not task_rows:
@@ -114,64 +133,95 @@ def _build_task_section(task_rows: List[Dict[str, Any]]) -> List[str]:
         task_name = task.get("task_name", f"任务{idx}")
         task_desc = task.get("task_description", "")
 
-        lines.append(f"### 任务 {idx}: {task_name}")
+        lines.append(f"**任务 {idx}**: {task_name}")
         lines.append("")
         if task_desc:
             lines.append(f"{task_desc}")
             lines.append("")
 
+    return lines
+
+
+def _build_workforce_section(task_rows: List[Dict[str, Any]]) -> List[str]:
+    """4.3 施工人数及工时（详细）"""
+    lines = []
+    lines.append("### 施工人数及工时")
+    lines.append("")
+
+    if not task_rows:
+        lines.append("*暂无施工人数及工时信息*")
+        lines.append("")
+        return lines
+
+    for idx, task in enumerate(task_rows, 1):
         work_items = task.get("work_items", [])
-        if work_items:
-            lines.append("| 工种 | 职级 | 人数 | 工时 | 置信度 |")
-            lines.append("|------|------|------|------|--------|")
+        if not work_items:
+            continue
 
-            for item in work_items:
-                work_type = item.get("work_type", {}).get("name", "-")
-                job_level = item.get("job_level", {}).get("name", "-")
-                persons = item.get("persons", "-")
-                hours = item.get("hours", "-")
-                conf = _format_confidence(item.get("confidence", ""))
+        lines.append(f"**任务 {idx}**: {task.get('task_name', f'任务{idx}')}")
+        lines.append("")
+        lines.append(
+            "| 详细工作内容 | 单位 | 数量 | 工种 | 职级 | 人数 | 单人工时 | 置信度 |"
+        )
+        lines.append(
+            "|--------------|------|------|------|------|------|----------|--------|"
+        )
 
-                lines.append(
-                    f"| {work_type} | {job_level} | {persons} | {hours} | {conf} |"
-                )
+        for item in work_items:
+            desc = item.get("description", "-")
+            unit = item.get("unit", {}).get("name", "-") if item.get("unit") else "-"
+            quantity = item.get("quantity", "-")
+            work_type = (
+                item.get("work_type", {}).get("name", "-")
+                if item.get("work_type")
+                else "-"
+            )
+            job_level = (
+                item.get("job_level", {}).get("name", "-")
+                if item.get("job_level")
+                else "-"
+            )
+            persons = item.get("persons", "-")
+            hours = item.get("hours", "-")
+            conf = _format_confidence(item.get("confidence", ""))
 
-            lines.append("")
+            lines.append(
+                f"| {desc} | {unit} | {quantity} | {work_type} | {job_level} | {persons} | {hours} | {conf} |"
+            )
 
-        suggested_hours = task.get("suggested_hours", {})
-        if suggested_hours:
-            hours_val = suggested_hours.get("value", "-")
-            hours_conf = _format_confidence(suggested_hours.get("confidence", ""))
-            lines.append(f"**建议工时**: {hours_val} 小时（{hours_conf}）")
-            lines.append("")
+        lines.append("")
 
     return lines
 
 
-def _build_totals_section(totals: Dict[str, Any]) -> List[str]:
+def _build_summary_totals_section(totals: Dict[str, Any]) -> List[str]:
+    """4.4 综述"""
     lines = []
-    lines.append("## 四、总计")
+    lines.append("### 综述")
     lines.append("")
 
     if not totals:
-        lines.append("*暂无总计信息*")
+        lines.append("*暂无综述信息*")
         lines.append("")
         return lines
 
     is_voyage = totals.get("is_voyage_repair", {})
     voyage_val = "是" if is_voyage.get("value", False) else "否"
     voyage_conf = _format_confidence(is_voyage.get("confidence", ""))
-    lines.append(f"- **是否航修**: {voyage_val}（{voyage_conf}）")
 
     total_hours = totals.get("total_hours", {})
     hours_val = total_hours.get("value", "-")
     hours_conf = _format_confidence(total_hours.get("confidence", ""))
-    lines.append(f"- **总工时**: {hours_val} 小时（{hours_conf}）")
 
     total_persons = totals.get("total_persons", {})
     persons_val = total_persons.get("value", "-")
     persons_conf = _format_confidence(total_persons.get("confidence", ""))
-    lines.append(f"- **总人数**: {persons_val} 人（{persons_conf}）")
+
+    lines.append("| 项目 | 数值 | 置信度 |")
+    lines.append("|------|------|--------|")
+    lines.append(f"| 是否航修 | {voyage_val} | {voyage_conf} |")
+    lines.append(f"| 总小时数 | {hours_val} 小时 | {hours_conf} |")
+    lines.append(f"| 总人数 | {persons_val} 人 | {persons_conf} |")
 
     explanation = totals.get("explanation", "")
     if explanation:
@@ -182,68 +232,71 @@ def _build_totals_section(totals: Dict[str, Any]) -> List[str]:
     return lines
 
 
-def _build_tools_section(
+def _build_resources_section(
     tool_rows: List[Dict[str, Any]],
     material_rows: List[Dict[str, Any]],
     special_tool_rows: List[Dict[str, Any]],
-) -> List[str]:
-    lines = []
-    lines.append("## 五、工具与耗材")
-    lines.append("")
-
-    if tool_rows:
-        lines.append("### 工具")
-        lines.append("")
-        lines.append("| 工具名称 | 型号 | 数量 | 单位 |")
-        lines.append("|----------|------|------|------|")
-        for tool in tool_rows:
-            name = tool.get("toolName", "-")
-            model = tool.get("model", "-")
-            qty = tool.get("quantity", "-")
-            unit = tool.get("unitMeasurement", {}).get("zhName", "-")
-            lines.append(f"| {name} | {model} | {qty} | {unit} |")
-        lines.append("")
-
-    if material_rows:
-        lines.append("### 耗材")
-        lines.append("")
-        lines.append("| 耗材名称 | 型号 | 数量 | 单位 |")
-        lines.append("|----------|------|------|------|")
-        for mat in material_rows:
-            name = mat.get("toolName", "-")
-            model = mat.get("model", "-")
-            qty = mat.get("quantity", "-")
-            unit = mat.get("unitMeasurement", {}).get("zhName", "-")
-            lines.append(f"| {name} | {model} | {qty} | {unit} |")
-        lines.append("")
-
-    if special_tool_rows:
-        lines.append("### 专用工具")
-        lines.append("")
-        lines.append("| 工具名称 | 型号 | 数量 | 单位 |")
-        lines.append("|----------|------|------|------|")
-        for tool in special_tool_rows:
-            name = tool.get("toolName", "-")
-            model = tool.get("model", "-")
-            qty = tool.get("quantity", "-")
-            unit = tool.get("unitMeasurement", {}).get("zhName", "-")
-            lines.append(f"| {name} | {model} | {qty} | {unit} |")
-        lines.append("")
-
-    if not (tool_rows or material_rows or special_tool_rows):
-        lines.append("*暂无工具与耗材信息*")
-        lines.append("")
-
-    return lines
-
-
-def _build_spare_parts_section(
     spare_parts: Dict[str, List[Dict[str, Any]]],
 ) -> List[str]:
+    """4.5-4.8 资源需求：工具、耗材、专用工具、设备/备件"""
     lines = []
-    lines.append("## 六、设备/备件需求")
+    lines.append("### 资源需求")
     lines.append("")
 
+    # 4.5 需要工具
+    lines.append("#### 需要工具")
+    lines.append("")
+    if tool_rows:
+        lines.append("| 工具名称 | 工具类型 | 计量单位 | 需要数量 |")
+        lines.append("|----------|----------|----------|----------|")
+        for tool in tool_rows:
+            name = tool.get("item_name", "-")
+            tool_type = _format_tool_type(tool.get("item_type_code"))
+            unit = tool.get("unit", {}).get("name", "-") if tool.get("unit") else "-"
+            qty = tool.get("quantity", "-")
+            lines.append(f"| {name} | {tool_type} | {unit} | {qty} |")
+        lines.append("")
+    else:
+        lines.append("*无需要工具*")
+        lines.append("")
+
+    # 4.6 耗材
+    lines.append("#### 耗材")
+    lines.append("")
+    if material_rows:
+        lines.append("| 耗材名称 | 耗材型号 | 计量单位 | 数量 |")
+        lines.append("|----------|----------|----------|------|")
+        for mat in material_rows:
+            name = mat.get("item_name", "-")
+            model = mat.get("item_model", "-") or "-"
+            unit = mat.get("unit", {}).get("name", "-") if mat.get("unit") else "-"
+            qty = mat.get("quantity", "-")
+            lines.append(f"| {name} | {model} | {unit} | {qty} |")
+        lines.append("")
+    else:
+        lines.append("*无耗材需求*")
+        lines.append("")
+
+    # 4.7 专用工具
+    lines.append("#### 专用工具")
+    lines.append("")
+    if special_tool_rows:
+        lines.append("| 专用工具名称 | 专用工具型号 | 计量单位 | 数量 |")
+        lines.append("|--------------|--------------|----------|------|")
+        for tool in special_tool_rows:
+            name = tool.get("item_name", "-")
+            model = tool.get("item_model", "-") or "-"
+            unit = tool.get("unit", {}).get("name", "-") if tool.get("unit") else "-"
+            qty = tool.get("quantity", "-")
+            lines.append(f"| {name} | {model} | {unit} | {qty} |")
+        lines.append("")
+    else:
+        lines.append("*无专用工具需求*")
+        lines.append("")
+
+    # 4.8 设备/备件需求
+    lines.append("#### 设备/备件需求")
+    lines.append("")
     if not spare_parts:
         lines.append("*暂无设备/备件需求信息*")
         lines.append("")
@@ -254,51 +307,71 @@ def _build_spare_parts_section(
     to_be_confirmed = spare_parts.get("to_be_confirmed", [])
 
     if customer_provided:
-        lines.append("### 客户提供")
-        lines.append("")
+        lines.append("**客户提供**")
         for item in customer_provided:
             lines.append(f"- {item.get('item_name', '-')}")
         lines.append("")
 
     if provider_provided:
-        lines.append("### 我方提供")
-        lines.append("")
+        lines.append("**我方提供**")
         for item in provider_provided:
             lines.append(f"- {item.get('item_name', '-')}")
         lines.append("")
 
     if to_be_confirmed:
-        lines.append("### 待确认")
-        lines.append("")
+        lines.append("**待确认**")
         for item in to_be_confirmed:
             lines.append(f"- {item.get('item_name', '-')}")
         lines.append("")
 
     if not (customer_provided or provider_provided or to_be_confirmed):
-        lines.append("*暂无设备/备件需求信息*")
+        lines.append("*暂无设备/备件需求*")
         lines.append("")
 
     return lines
 
 
-def _build_confidence_section(confidence_summary: Dict[str, Any]) -> List[str]:
-    lines = []
-    lines.append("## 七、置信度汇总")
-    lines.append("")
+def _format_tool_type(tool_type_no: Any) -> str:
+    """转换工具类型编号为中文"""
+    mapping = {
+        1: "手动工具",
+        2: "电动工具",
+        3: "气动工具",
+        4: "液压工具",
+        5: "测量工具",
+        6: "起重工具",
+        7: "焊接工具",
+        8: "其他",
+    }
+    if isinstance(tool_type_no, int) and tool_type_no in mapping:
+        return mapping[tool_type_no]
+    return str(tool_type_no) if tool_type_no else "-"
 
-    if not confidence_summary:
-        lines.append("*暂无置信度信息*")
+    customer_provided = spare_parts.get("customer_provided", [])
+    provider_provided = spare_parts.get("provider_provided", [])
+    to_be_confirmed = spare_parts.get("to_be_confirmed", [])
+
+    if customer_provided:
+        lines.append("**客户提供**")
+        for item in customer_provided:
+            lines.append(f"- {item.get('item_name', '-')}")
         lines.append("")
-        return lines
 
-    risk_conf = _format_confidence(confidence_summary.get("risk", ""))
-    workhour_conf = _format_confidence(confidence_summary.get("workhour", ""))
-    manpower_conf = _format_confidence(confidence_summary.get("manpower", ""))
+    if provider_provided:
+        lines.append("**我方提供**")
+        for item in provider_provided:
+            lines.append(f"- {item.get('item_name', '-')}")
+        lines.append("")
 
-    lines.append(f"- **风险**: {risk_conf}")
-    lines.append(f"- **工时**: {workhour_conf}")
-    lines.append(f"- **人数**: {manpower_conf}")
-    lines.append("")
+    if to_be_confirmed:
+        lines.append("**待确认**")
+        for item in to_be_confirmed:
+            lines.append(f"- {item.get('item_name', '-')}")
+        lines.append("")
+
+    if not (customer_provided or provider_provided or to_be_confirmed):
+        lines.append("*暂无设备/备件需求*")
+        lines.append("")
 
     return lines
 
@@ -307,11 +380,11 @@ def _build_review_focus_section(
     review_focus: List[str], warnings: List[Dict[str, Any]]
 ) -> List[str]:
     lines = []
-    lines.append("## 八、审核重点")
+    lines.append("### 审核重点")
     lines.append("")
 
     if warnings:
-        lines.append("### ⚠️ 警告提示")
+        lines.append("#### ⚠️ 警告提示")
         lines.append("")
         for w in warnings:
             severity = w.get("severity", "medium")
@@ -321,7 +394,7 @@ def _build_review_focus_section(
         lines.append("")
 
     if review_focus:
-        lines.append("### 重点关注")
+        lines.append("#### 重点关注")
         lines.append("")
         for focus in review_focus:
             lines.append(f"- {focus}")
@@ -330,46 +403,6 @@ def _build_review_focus_section(
     if not (warnings or review_focus):
         lines.append("*暂无审核重点*")
         lines.append("")
-
-    return lines
-
-
-def _build_learning_section(learning_summary: Dict[str, Any]) -> List[str]:
-    lines = []
-    lines.append("## 九、学习资产参考")
-    lines.append("")
-
-    if not learning_summary:
-        lines.append("*本次无学习资产参考*")
-        lines.append("")
-        return lines
-
-    sample_ids = learning_summary.get("used_learning_sample_ids", [])
-    hints = learning_summary.get("applied_learning_hints", [])
-
-    if sample_ids:
-        lines.append(f"- **参考学习样本**: {len(sample_ids)} 个")
-    else:
-        lines.append("- **参考学习样本**: 无")
-
-    if hints:
-        hint_texts = []
-        for h in hints:
-            if "raise_risk" in h:
-                hint_texts.append("类似场景常上调风险等级")
-            elif "spare_part" in h:
-                hint_texts.append("类似场景常补充备件说明")
-            elif "increase_hours" in h:
-                hint_texts.append("类似场景常增加工时")
-            else:
-                hint_texts.append(h)
-        lines.append(f"- **学习提示**: {', '.join(hint_texts)}")
-    else:
-        lines.append("- **学习提示**: 无")
-
-    lines.append("")
-    lines.append("> 💡 系统已从历史修订经验中学习，以上提示供参考。")
-    lines.append("")
 
     return lines
 
