@@ -1,0 +1,19 @@
+{
+  "name": "Review Persistence Skill",
+  "slug": "review-persistence-skill",
+  "version": "2.0.0",
+  "description": "评估单状态持久化与恢复管理（集成到 dialog-intent-detector）",
+  "author": "智能评估助理",
+  "tags": ["persistence", "review", "state-management"],
+  "clawdbot": {
+    "entryPoint": "scripts/main.py",
+    "runtime": "python",
+    "env": {
+      "REDIS_HOST": "localhost",
+      "REDIS_PORT": "6379",
+      "REDIS_DB": "0",
+      "STATE_TTL_SECONDS": "3600",
+      "PENDING_LIST_TTL_SECONDS": "86400"
+    }
+  }
+}
