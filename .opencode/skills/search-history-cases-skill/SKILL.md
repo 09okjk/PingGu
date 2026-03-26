@@ -96,6 +96,131 @@ npm run search:electrical # 电气案例
 - `remark`: 备注信息（用于备注相似度计算）
 - `top_k`: 返回结果数量
 
+## Output Contract（输出契约）
+
+### 输出结构
+
+```json
+{
+  "success": true,
+  "data": {
+    "cases": [
+      {
+        "case_id": "RH-2025-0009611001",
+        "task_description": "主机常规坞修保养工作",
+        "similarity_score": 0.85,
+        "match_reasons": ["service_desc_match", "equipment_match"],
+        "service_type_relaxed": false,
+        "personnel": [
+          {
+            "work_type_code": "JN0002",
+            "work_type_name": "轮机工程师",
+            "job_level_code": "MT5",
+            "job_level_name": "高级工程师 (T5)",
+            "quantity": 1,
+            "construction_hour": 110.0,
+            "task_desc": "主机常规坞修保养工作"
+          }
+        ],
+        "tools": [
+          {
+            "toolName": "LDM",
+            "toolTypeNo": 4,
+            "quantity": 1,
+            "unitMeasurement": {"no": "UM0005", "zhName": "台"}
+          }
+        ],
+        "materials": [
+          {
+            "toolName": "氧气",
+            "model": "40L",
+            "quantity": 3,
+            "unitMeasurement": {"no": "UM0018", "zhName": "瓶"}
+          }
+        ],
+        "special_tools": [
+          {
+            "toolName": "驳船",
+            "model": "符合甲板面积",
+            "quantity": 2,
+            "unitMeasurement": {"no": "UM0150", "zhName": "次"}
+          }
+        ]
+      }
+    ],
+    "total_cases": 5,
+    "search_params": {
+      "business_type": "轮机",
+      "service_desc_code": "RS0000000001",
+      "service_type_code": "CS0001",
+      "top_k": 5
+    },
+    "search_notes": []
+  },
+  "error": null
+}
+```
+
+### 字段说明
+
+| 字段 | 类型 | 说明 |
+|------|------|------|
+| `case_id` | string | 历史案例 ID（如 RH-2025-0009611001） |
+| `task_description` | string | 任务描述 |
+| `similarity_score` | number | 相似度得分 (0-1)，越高越相似 |
+| `match_reasons` | array | 匹配原因列表（service_desc_match, equipment_match, task_desc_similar 等） |
+| `service_type_relaxed` | boolean | 是否放宽了服务类型检索条件 |
+| `personnel` | array | 人员配置列表 |
+| `tools` | array | 工具列表 |
+| `materials` | array | 耗材列表 |
+| `special_tools` | array | 专用工具列表 |
+| `total_cases` | number | 返回的案例总数 |
+| `search_params` | object | 实际使用的检索参数 |
+| `search_notes` | array | 检索过程说明（如放宽条件提示） |
+
+### 人员配置字段
+
+| 字段 | 类型 | 说明 |
+|------|------|------|
+| `work_type_code` | string | 工种编码（如 JN0002） |
+| `work_type_name` | string | 工种名称 |
+| `job_level_code` | string | 职级编码（如 MT5） |
+| `job_level_name` | string | 职级名称 |
+| `quantity` | number | 人数 |
+| `construction_hour` | number | 工时（小时） |
+| `task_desc` | string | 任务描述 |
+
+### 工具/耗材/专用工具字段
+
+| 字段 | 类型 | 说明 |
+|------|------|------|
+| `toolName` | string | 工具/耗材名称 |
+| `model` / `toolTypeNo` | string/number | 型号或类型编号 |
+| `quantity` | number | 数量 |
+| `unitMeasurement` | object | 计量单位 {no: 编码，zhName: 中文名称} |
+
+### 错误示例
+
+```json
+{
+  "success": false,
+  "data": null,
+  "error": {
+    "code": "DB_CONNECTION_FAILED",
+    "message": "无法连接到 PostgreSQL 数据库，请检查 .env 配置"
+  }
+}
+```
+
+## Error Codes（错误码）
+
+| 错误码 | 说明 | 触发条件 |
+|--------|------|---------|
+| `DB_CONNECTION_FAILED` | 数据库连接失败 | 无法连接 PostgreSQL |
+| `INVALID_INPUT` | 输入格式错误 | 输入 JSON 无法解析或缺少必填字段 |
+| `DB_QUERY_ERROR` | 数据库查询错误 | SQL 执行失败 |
+| `EXTENSION_MISSING` | 缺少 pg_trgm 扩展 | 数据库未启用 pg_trgm |
+
 ## Core Rules（核心规则）
 
 1. `business_type` 与 `service_desc_code` 为必填主检索维度。  
