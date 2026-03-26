@@ -7,6 +7,7 @@
   python3 main.py --action get_state --task-id "TASK-001" --pretty
   python3 main.py --action reset_state --task-id "TASK-001" --pretty
 """
+
 import argparse
 import io
 import json
@@ -21,8 +22,8 @@ if sys.platform == "win32":
             sys.stdout.buffer, encoding="utf-8", line_buffering=True
         )
 
-# 导入同级目录的模块
-sys.path.insert(0, str(Path(__file__).parent.parent))
+# 导入同级目录的模块（现在都在 scripts/ 目录内）
+sys.path.insert(0, str(Path(__file__).parent))
 from dialog_intent_detector import DialogIntentDetector, DialogState, IntentType
 from review_state_machine import ReviewStateMachine
 
@@ -45,13 +46,13 @@ def parse_args() -> argparse.Namespace:
   
   # 使用 JSON 输入
   python3 main.py --action process_message --json-input '{"message":"确认","task_id":"TASK-001"}' --pretty
-        """
+        """,
     )
     parser.add_argument(
         "--action",
         required=True,
         choices=["process_message", "get_state", "reset_state"],
-        help="操作类型"
+        help="操作类型",
     )
     parser.add_argument("--message", help="用户消息内容")
     parser.add_argument("--task-id", help="任务 ID")
@@ -67,7 +68,7 @@ def parse_args() -> argparse.Namespace:
 def load_payload(args: argparse.Namespace) -> Optional[Dict[str, Any]]:
     """从文件或内联 JSON 加载 payload。"""
     if args.json_input_file:
-        with open(args.json_input_file, 'r', encoding='utf-8') as f:
+        with open(args.json_input_file, "r", encoding="utf-8") as f:
             return json.load(f)
     if args.json_input:
         return json.loads(args.json_input)
@@ -79,38 +80,38 @@ def process_message(
     task_id: str,
     current_state: Optional[str] = None,
     org_id: str = "default-org",
-    user_id: str = "default-user"
+    user_id: str = "default-user",
 ) -> Dict[str, Any]:
     """
     处理用户消息，返回 Agent 响应和状态更新。
-    
+
     Args:
         message: 用户消息内容
         task_id: 任务 ID
         current_state: 当前状态（可选）
         org_id: 组织 ID
         user_id: 用户 ID
-    
+
     Returns:
         包含响应消息、状态更新、动作指示的字典
     """
     # 初始化检测器和状态机
     detector = DialogIntentDetector()
     state_machine = ReviewStateMachine(task_id=task_id, org_id=org_id, user_id=user_id)
-    
+
     # 如果有当前状态，先设置
     if current_state:
         try:
             state_machine.state = DialogState(current_state)
         except ValueError:
             pass  # 忽略无效状态
-    
+
     # 检测意图
     intent_result = detector.detect_intent(message, state_machine.context)
-    
+
     # 状态机处理
     response = state_machine.handle_user_message(message)
-    
+
     # 构造返回结果
     result = {
         "success": True,
@@ -123,18 +124,20 @@ def process_message(
             "s3_input": response.get("s3_input"),
             "s3_input_constructed": response.get("s3_input_constructed", False),
         },
-        "error": None
+        "error": None,
     }
-    
+
     # 如果触发了 S3，添加 S3 调用指示
     if response.get("action") == "call_s3":
         result["data"]["call_s3"] = True
         result["data"]["s3_payload"] = response.get("s3_input")
-    
+
     return result
 
 
-def get_state(task_id: str, org_id: str = "default-org", user_id: str = "default-user") -> Dict[str, Any]:
+def get_state(
+    task_id: str, org_id: str = "default-org", user_id: str = "default-user"
+) -> Dict[str, Any]:
     """获取当前状态。"""
     state_machine = ReviewStateMachine(task_id=task_id, org_id=org_id, user_id=user_id)
     return {
@@ -144,11 +147,13 @@ def get_state(task_id: str, org_id: str = "default-org", user_id: str = "default
             "state": state_machine.context.state.value,
             "modification_count": state_machine.modification_count,
         },
-        "error": None
+        "error": None,
     }
 
 
-def reset_state(task_id: str, org_id: str = "default-org", user_id: str = "default-user") -> Dict[str, Any]:
+def reset_state(
+    task_id: str, org_id: str = "default-org", user_id: str = "default-user"
+) -> Dict[str, Any]:
     """重置状态。"""
     state_machine = ReviewStateMachine(task_id=task_id, org_id=org_id, user_id=user_id)
     state_machine.reset()
@@ -159,24 +164,29 @@ def reset_state(task_id: str, org_id: str = "default-org", user_id: str = "defau
             "state": state_machine.state.value,
             "message": "状态已重置",
         },
-        "error": None
+        "error": None,
     }
 
 
 def main():
     args = parse_args()
-    
+
     try:
         if args.action == "process_message":
             if not args.message:
                 # 从 JSON 输入中获取消息
                 payload = load_payload(args)
                 if not payload or "message" not in payload:
-                    print(json.dumps({
-                        "success": False,
-                        "data": None,
-                        "error": "message is required"
-                    }, ensure_ascii=False))
+                    print(
+                        json.dumps(
+                            {
+                                "success": False,
+                                "data": None,
+                                "error": "message is required",
+                            },
+                            ensure_ascii=False,
+                        )
+                    )
                     return
                 message = payload["message"]
                 task_id = payload.get("task_id", "default")
@@ -189,36 +199,36 @@ def main():
                 current_state = args.state
                 org_id = args.org_id
                 user_id = args.user_id
-            
+
             result = process_message(message, task_id, current_state, org_id, user_id)
-        
+
         elif args.action == "get_state":
             task_id = args.task_id or "default"
             result = get_state(task_id, args.org_id, args.user_id)
-        
+
         elif args.action == "reset_state":
             task_id = args.task_id or "default"
             result = reset_state(task_id, args.org_id, args.user_id)
-        
+
         else:
             result = {
                 "success": False,
                 "data": None,
-                "error": f"Unknown action: {args.action}"
+                "error": f"Unknown action: {args.action}",
             }
-        
+
         # 输出结果
         if args.pretty:
             print(json.dumps(result, ensure_ascii=False, indent=2))
         else:
             print(json.dumps(result, ensure_ascii=False))
-    
+
     except Exception as e:
-        print(json.dumps({
-            "success": False,
-            "data": None,
-            "error": str(e)
-        }, ensure_ascii=False))
+        print(
+            json.dumps(
+                {"success": False, "data": None, "error": str(e)}, ensure_ascii=False
+            )
+        )
         sys.exit(1)
 
 

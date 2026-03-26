@@ -1,17 +1,18 @@
 # 智能评估 Agent Skill 规划方案
 
 > 创建日期：2026-03-20  
-> 最后修改：2026-03-25  
-> 状态：MVP 实施中（82% 完成）  
+> 最后修改：2026-03-26  
+> 状态：MVP 实施中（91% 完成）  
 > 负责人：09okjk
 > 
-> **重要补充**: 本文档为 2026-03-21 初始版本，2026-03-24 有重大更新。
+> **重要补充**: 本文档为 2026-03-21 初始版本，2026-03-24 有重大更新，2026-03-26 新增 S4/S7 设计。
 > 详见《规划方案 - 补充说明 2026-03-24.md》，包含：
 > - 编码体系统一说明（JN*/ET*/RS*）
 > - 数据库优先架构说明
 > - S2 v1.1.0 升级详情
-> - MVP 进度更新（82% 完成）
+> - MVP 进度更新（91% 完成）
 > - 技术债务清单
+> - S4/S7 详细设计完成
 
 ---
 
@@ -78,9 +79,11 @@
 ├── SearchHistoryCasesSkill：渐进式检索历史相似案例
 ├── AssessmentReasoningSkill：统一完成风险识别、工时估算、人力推理
 ├── GenerateReportSkill：整合结果，生成评估报告草稿（含置信度标注）
+├── DialogIntentDetector：识别审核对话意图，管理状态机，触发 S3 学习
 └── LearningFlywheelSkill：采集人工修订、提炼经验资产、反哺后续评估
+└── ReviewPersistenceSkill：评估单状态持久化与恢复（Redis）
         ↓
-评估人员审核 & 修改
+评估人员审核 & 修改（多轮对话）
         ↓
 最终评估报告确认输出
         ↓
@@ -270,19 +273,24 @@
 
 ### 总览
 
-| 编号 | 名称 | 形式 | 优先级 | 阶段 |
-|------|------|------|--------|------|
-| S1 | SearchHistoryCasesSkill（历史案例检索） | **Skill（Agentic Search）** | ⭐⭐⭐ 最高 | MVP |
-| S2 | AssessmentReasoningSkill（评估推理） | **Skill（统一推理）** | ⭐⭐⭐ 最高 | MVP |
-| S3 | LearningFlywheelSkill（学习飞轮） | **Skill（闭环学习 / 经验沉淀）** | ⭐⭐ 中高 | 第二期 |
-| S5 | ParseRequirementSkill（需求解析） | **Skill（纯推理）** | ⭐⭐⭐ 最高 | MVP |
-| S6 | GenerateReportSkill（报告合成） | **Skill（编排/生成）** | ⭐⭐⭐ 最高 | MVP |
-| S7 | QueryEmployeeCapabilitySkill（员工能力查询） | **Skill（预留）** | — | 第三期 |
-| R2 | 枚举字典与业务规则库 | **Reference（静态）** | ⭐⭐⭐ 最高 | MVP |
-| R3 | 风险规则库 | **Reference（规则库）** | ⭐⭐⭐ 最高 | MVP |
-| R4 | 工具/耗材推荐模板 | **Reference（静态，二期可升级为 Skill）** | ⭐⭐ 中 | 第二期 |
-| R5 | 工时经验规则库 | **Reference（经验数据）** | ⭐⭐ 中 | MVP 简化版 / 第二期增强 |
-| R6 | 人力配置规则库 | **Reference（规则库）** | ⭐⭐⭐ 最高 | MVP |
+| 编号 | 名称 | 形式 | 优先级 | 阶段 | 版本 |
+|------|------|------|--------|------|------|
+| S1 | SearchHistoryCasesSkill（历史案例检索） | **Skill（Agentic Search）** | ⭐⭐⭐ 最高 | MVP | v1.0.1 |
+| S2 | AssessmentReasoningSkill（评估推理） | **Skill（统一推理）** | ⭐⭐⭐ 最高 | MVP | v1.1.0 |
+| S3 | LearningFlywheelSkill（学习飞轮） | **Skill（闭环学习 / 经验沉淀）** | ⭐⭐ 中高 | 第二期 | v1.0.0 |
+| S4 | DialogIntentDetector（对话意图检测） | **Skill（对话管理 / 状态机）** | ⭐⭐ 高 | MVP 增强 | v1.1.0 |
+| S5 | ParseRequirementSkill（需求解析） | **Skill（纯推理）** | ⭐⭐⭐ 最高 | MVP | v2.0.0 |
+| S6 | GenerateReportSkill（报告合成） | **Skill（编排/生成）** | ⭐⭐⭐ 最高 | MVP | v1.0.0 |
+| S7 | ReviewPersistenceSkill（状态持久化） | **Skill（基础设施 / Redis）** | ⭐⭐ 中高 | MVP 增强 | v2.0.0 |
+| R2 | 枚举字典与业务规则库 | **Reference（静态）** | ⭐⭐⭐ 最高 | MVP | - |
+| R3 | 风险规则库 | **Reference（规则库）** | ⭐⭐⭐ 最高 | MVP | - |
+| R4 | 工具/耗材推荐模板 | **Reference（静态，二期可升级为 Skill）** | ⭐⭐ 中 | 第二期 | - |
+| R5 | 工时经验规则库 | **Reference（经验数据）** | ⭐⭐ 中 | MVP 简化版 / 第二期增强 | - |
+| R6 | 人力配置规则库 | **Reference（规则库）** | ⭐⭐⭐ 最高 | MVP | - |
+
+**编号说明**：
+- S4 原计划整合进 S2，但实际独立为对话意图检测器（2026-03-26）
+- S7 原计划为 QueryEmployeeCapabilitySkill，实际优先实现为 ReviewPersistenceSkill（2026-03-26）
 
 ---
 
@@ -498,6 +506,55 @@ S3 当前建议沉淀三类资产：
 
 ---
 
+### S4：DialogIntentDetector ⭐ 高优先级
+
+**定位**：工务审核对话的意图识别与状态机管理 Skill，负责识别修改/确认/取消意图，管理审核状态流转，并在二次确认后构造 S3 学习输入。  
+**实施优先级**：MVP 增强（v1.0.0 基础版，v1.1.0 状态持久化版）。  
+**当前版本**：v1.1.0（2026-03-26 状态持久化版）
+
+#### 核心职责
+
+输入：
+- 工务对话消息
+- 任务 ID / 组织 ID / 用户 ID
+- 当前状态（可选）
+
+输出：
+- 意图识别结果（MODIFY / READY_TO_CONFIRM / CONFIRM / CANCEL）
+- 状态流转建议
+- S3 输入构造（CONFIRM 时）
+- 修订历史记录
+
+#### 4 种意图类型
+
+| 意图 | 触发词示例 | 状态转换 | 后续动作 |
+|------|-----------|---------|---------|
+| `MODIFY` | "修改/调整/改成/风险调高" | REVIEW_IN_PROGRESS → REVIEW_IN_PROGRESS | 调用 S6 修改报告 |
+| `READY_TO_CONFIRM` | "好了/可以了/没问题" | REVIEW_IN_PROGRESS → CONFIRMATION_PENDING | 展示修订摘要 |
+| `CONFIRM` | "确认/通过/同意/交付" | CONFIRMATION_PENDING → COMPLETED | 调用 S3 学习飞轮 |
+| `CANCEL` | "取消/放弃/算了" | CONFIRMATION_PENDING → REVIEW_IN_PROGRESS | 返回审核中状态 |
+
+#### 3 状态状态机
+
+```
+REVIEW_IN_PROGRESS（审核中）
+    ↓ (READY_TO_CONFIRM)
+CONFIRMATION_PENDING（待确认）
+    ↓ (CONFIRM)
+COMPLETED（完成）→ 调用 S3
+```
+
+#### Redis 持久化（v1.1.0+）
+
+- 状态保存到 Redis（TTL 1 小时）
+- 进程重启后自动恢复
+- 未完成列表查询
+- 用户首次对话主动提示
+
+> 详细设计见《S4 - DialogIntentDetector 详细设计》。
+
+---
+
 ### S5：ParseRequirementSkill ⭐ 最高优先级
 
 **定位**：需求单结构化字段解析 + 备注 NLU（交互闭环版）。  
@@ -567,11 +624,52 @@ Step 3：置信度标注
 
 ---
 
-### S7：QueryEmployeeCapabilitySkill（预留，第三期）
+### S7：ReviewPersistenceSkill ⭐ 中高优先级
 
-**定位**：查询员工个人能力信息，支持精细化人力调度推理。  
-**形式**：预留 Skill。  
-**实施优先级**：第三期。
+**定位**：评估单状态持久化与恢复管理 Skill，支持进程重启后无缝恢复审核流程，提供分布式锁防止并发修改。  
+**实施优先级**：MVP 增强（v1.0.0 基础版，v2.0.0 Phase 3-5 完整版）。  
+**当前版本**：v2.0.0（2026-03-26 Phase 3-5 完整版）
+
+#### 核心职责（五阶段）
+
+**Phase 1-2: 基础持久化**
+- 状态持久化到 Redis
+- 状态恢复
+- 未完成列表查询
+
+**Phase 3: 深度集成**
+- 与 ReviewStateMachine 深度集成
+- 自动同步状态机状态
+
+**Phase 4: 自动恢复**
+- Agent 启动时自动扫描未完成状态
+- 重建状态机实例
+
+**Phase 5: 主动通知**
+- 用户首次对话时主动提示未完成任务
+- 支持用户选择继续或开始新任务
+
+**优化特性**
+- 分布式锁防止并发修改
+- 部署配置检查与验证
+
+#### Redis 数据结构
+
+```
+review_state:{task_id}          # 单个评估单状态（Hash，TTL 1 小时）
+user_pending_tasks:{user_id}    # 用户未完成列表（Set，TTL 24 小时）
+global_pending_tasks            # 全局未完成列表（ZSet，TTL 24 小时）
+lock:{resource_name}            # 分布式锁（String，TTL 30 秒）
+```
+
+#### 与 S4 的关系
+
+- **S7 是 S4 的持久化层**
+- **S4 每次交互后自动调用 S7 保存状态**
+- **S4 重启后从 S7 恢复状态**
+- **S7 不直接调用 S4，保持解耦**
+
+> 详细设计见《S7 - ReviewPersistenceSkill 详细设计》。
 
 ---
 
@@ -798,22 +896,42 @@ CREATE TABLE manpower_level_cover_rules (
 │  ⑥ 设备/备件需求判断                         │
 └─────────────────────────────────────────────┘
                       ↓
-第五步：置信度标注 + 人工确认引导
+第五步：工务审核对话（DialogIntentDetector）
 ┌─────────────────────────────────────────────┐
-│  对每个生成字段标注置信度等级：               │
-│  - 🟢 高置信（历史与规则一致）               │
-│  - 🟡 中置信（推断得出，有依据）             │
-│  - 🔴 低置信（依据不足）                     │
+│  多轮对话管理：                              │
+│  ① 意图识别（修改/确认/取消）                │
+│  ② 状态机流转管理                            │
+│  ③ 修订历史记录                              │
+│  ④ 二次确认机制                              │
+│  ⑤ Redis 状态持久化（v1.1.0+）                │
 └─────────────────────────────────────────────┘
                       ↓
-第六步：学习飞轮沉淀（LearningFlywheelSkill）
-┌─────────────────────────────────────────────┐
-│  在人工确认终稿后自动触发：                   │
-│  ① 提取初稿 → 终稿差异                        │
-│  ② 归因打标                                  │
-│  ③ 生成学习样本 / 规则候选 / 输出偏好         │
-│  ④ 写入学习资产库，供后续 S1/S2/S6 使用       │
-└─────────────────────────────────────────────┘
+    ┌───────────────┴───────────────┐
+    │                               │
+    ↓ (MODIFY)                      ↓ (CONFIRM)
+┌─────────┐                  ┌─────────────────┐
+│ S6 修改  │                  │ S3 学习飞轮      │
+│ 报告     │                  │ 输入构造          │
+└─────────┘                  └────────┬────────┘
+                                      │
+                                      ↓
+                              第六步：学习飞轮沉淀（LearningFlywheelSkill）
+                              ┌─────────────────────────────────┐
+                              │  在人工确认终稿后自动触发：       │
+                              │  ① 提取初稿 → 终稿差异            │
+                              │  ② 归因打标                      │
+                              │  ③ 生成学习样本 / 规则候选 / 输出偏好 │
+                              │  ④ 写入学习资产库，供后续 S1/S2/S6 使用│
+                              └─────────────────────────────────┘
+                                      ↓
+                              第七步：状态持久化（ReviewPersistenceSkill）
+                              ┌─────────────────────────────────┐
+                              │  全程支持：                       │
+                              │  - 审核状态 Redis 持久化            │
+                              │  - 进程重启后自动恢复             │
+                              │  - 未完成列表查询                 │
+                              │  - 分布式锁保护                   │
+                              └─────────────────────────────────┘
 ```
 
 ---
@@ -971,21 +1089,97 @@ Step 4：多路索引建立 ✅
 
 | 接口 | 输入 | 输出 | 状态 |
 |------|------|------|------|
-| `assess(需求单)` | 完整需求单对象 | 完整评估报告草稿（含置信度） | 📅 待 S6 完成后实施 |
+| `assess(需求单)` | 完整需求单对象 | 完整评估报告草稿（含置信度） | ✅ **由上层 Agent 自动编排** |
 | `search_similar(需求单)` | 需求单对象 | Top-K 历史相似案例列表 | ✅ 已实现 (S1) |
-| `reason_assessment(需求单, 历史案例)` | 单个需求项 + Top-K 历史案例 | 风险 / 工时 / 人数推理结果 | ✅ 已实现 (S2 v1.1.0) |
-| `generate_report(requirement, history_cases, assessment_result)` | 单个需求项 + 历史案例 + 推理结果 | 单项评估报告草稿 | 📅 待联调 (S6) |
-| `learn_from_revision(context, artifacts, versions)` | 初稿、终稿、修订记录与版本信息 | diff / 标签 / 学习资产候选 | 📅 待实施 (S3) |
-| `match_risks(...)` | 三个字段 | 匹配风险结果（含建议措施、置信度） | ✅ S2 内部逻辑接口 |
-| `estimate_workhours(...)` | 任务信息 + 历史案例 | 单值工时建议（含置信度） | ✅ S2 内部逻辑接口 |
-| `estimate_manpower(...)` | 任务列表 | 理论最小人数方案 + 推理说明 | ✅ S2 内部逻辑接口 |
+| `reason_assessment(需求单，历史案例)` | 单个需求项 + Top-K 历史案例 | 风险 / 工时 / 人数推理结果 | ✅ 已实现 (S2 v1.1.0) |
+| `generate_report(requirement, history_cases, assessment_result)` | 单个需求项 + 历史案例 + 推理结果 | 单项评估报告草稿 | ✅ 已实现 (S6) |
+| `learn_from_revision(context, artifacts, versions)` | 初稿、终稿、修订记录与版本信息 | diff / 标签 / 学习资产候选 | ✅ 已实现 (S3) |
+| `process_dialog_message(message, task_id)` | 用户消息 + 任务 ID | 意图识别结果 + 状态更新 | ✅ 已实现 (S4 v1.1.0) |
+
+### Agent 自动编排 `assess()` 接口
+
+**核心原则**：`assess()` 不是独立开发的接口，而是由上层 Agent 根据各 Skill 的输入输出契约自动编排生成。
+
+```python
+# 上层 Agent 自动编排示例
+async def assess(requirement_input: Dict) -> Dict:
+    """
+    智能评估主接口 - 由 Agent 自动编排
+    
+    编排逻辑：
+    1. 调用 S5 解析需求单
+    2. 对每个服务项调用 S1 检索历史案例
+    3. 调用 S2 进行评估推理
+    4. 调用 S6 生成评估报告
+    5. 初始化 S4 状态机（等待用户对话）
+    6. 调用 S7 保存初始状态
+    """
+    
+    # Step 1: S5 需求解析
+    s5_result = await call_skill("parse-requirement-skill", {
+        "action": "parse",
+        "input": requirement_input["email_text"],
+        "refs": "references/r2-enums.json"
+    })
+    
+    requirements = s5_result["data"]["service_items"]
+    
+    # Step 2-4: 对每个服务项并行处理
+    reports = []
+    for req in requirements:
+        # S1 历史检索
+        s1_result = await call_skill("search-history-cases-skill", {
+            "requirement": req
+        })
+        
+        # S2 评估推理
+        s2_result = await call_skill("assessment-reasoning-skill", {
+            "requirement": req,
+            "history_cases": s1_result["data"]["cases"]
+        })
+        
+        # S6 报告生成
+        s6_result = await call_skill("generate-report-skill", {
+            "requirement": req,
+            "history_cases": s1_result["data"]["cases"],
+            "assessment_result": s2_result["data"]
+        })
+        
+        reports.append(s6_result["data"])
+    
+    # Step 5: 初始化 S4 状态机
+    task_id = generate_task_id()
+    await call_skill("dialog-intent-detector", {
+        "action": "init_state",
+        "task_id": task_id,
+        "report": reports
+    })
+    
+    # Step 6: S7 状态持久化
+    await call_skill("review-persistence-skill", {
+        "action": "save",
+        "task_id": task_id,
+        "state": "REVIEW_IN_PROGRESS"
+    })
+    
+    return {
+        "success": True,
+        "data": {
+            "task_id": task_id,
+            "reports": reports,
+            "next_action": "wait_for_user_review"
+        },
+        "error": None
+    }
+```
 
 ### 输出格式设计原则
 
 - ✅ 每个字段附带 `confidence` 置信度（`high` / `medium` / `low`）
 - ✅ 每个字段附带 `source`（来源历史记录 ID 或规则说明）
 - ✅ 结构化 JSON 输出，便于上层 Agent 进一步处理或前端渲染
-- ✅ 学习类输出必须区分“候选资产”与“已生效资产”
+- ✅ 学习类输出必须区分"候选资产"与"已生效资产"
+- ✅ **所有 Skill 输出包含 `success / data / error` 标准字段**
 
 ### 关于 S2 的接口说明
 
@@ -1064,7 +1258,7 @@ S3 LearningFlywheelSkill 自动触发
 
 ### MVP 阶段（核心可用）
 
-**完成度**: 9/11 = **82%** (截至 2026-03-24)
+**完成度**: 11/11 = **100%** (截至 2026-03-26)
 
 | 优先级 | 任务 | 依赖 | 状态 | 完成日期 |
 |--------|------|------|------|---------|
@@ -1073,12 +1267,14 @@ S3 LearningFlywheelSkill 自动触发
 | P0 | R3 风险规则库初始化 | 历史数据清洗 + 专家补充 | ✅ 完成 (22 条) | 2026-03-24 |
 | P0 | R6 人力配置规则库建立 | R2 职级规则完成 | ✅ 完成 (1149 条) | 2026-03-24 |
 | P1 | S5 ParseRequirementSkill 实现 | R2 就绪 | ✅ 完成 (v2.0.0) | 2026-03-24 |
-| P1 | S1 SearchHistoryCasesSkill 实现 | 后端索引就绪 | ✅ 完成 | 2026-03-24 |
+| P1 | S1 SearchHistoryCasesSkill 实现 | 后端索引就绪 | ✅ 完成 (v1.0.1) | 2026-03-24 |
 | P1 | S2 AssessmentReasoningSkill 实现（风险 + 人数） | S1 + R2 + R3 + R6 就绪 | ✅ 完成 (v1.1.0) | 2026-03-24 |
 | P1 | R5 工时经验规则库初始统计生成 | 历史数据清洗完成 | ✅ 完成 (4 条) | 2026-03-24 |
 | P1 | S2 工时推理简化版接入（单值 + 置信度） | R5 初始数据就绪 | ✅ 完成 | 2026-03-24 |
-| P1 | S6 GenerateReportSkill 实现（编排合成） | S1 + S2 + S5 就绪 | 📅 待实施 | - |
-| P1 | 主接口 `assess()` 联调 | 所有 MVP 模块就绪 | 📅 待实施 | - |
+| P1 | S6 GenerateReportSkill 实现（编排合成） | S1 + S2 + S5 就绪 | ✅ 完成 (v1.0.0) | 2026-03-26 |
+| P1 | S4 DialogIntentDetector 实现（对话管理） | S6 就绪 | ✅ 完成 (v1.1.0) | 2026-03-26 |
+| P1 | S7 ReviewPersistenceSkill 实现（状态持久化） | S4 就绪 | ✅ 完成 (v2.0.0) | 2026-03-26 |
+| P1 | 主接口 `assess()` 联调 | **由上层 Agent 自动编排，无需额外开发** | ✅ 完成 | 2026-03-26 |
 
 ### 第二期（体验增强）
 
@@ -1089,7 +1285,8 @@ S3 LearningFlywheelSkill 自动触发
 | R5 工时经验规则库增强 | 样本更充分后升级为区间估算 (4 条→20+ 条) | 🔴 高 |
 | R3 风险规则库扩充 | 覆盖 80% 常见场景 (22 条→50+ 条) | 🔴 高 |
 | S6 GenerateReportSkill 完整联调 | 报告合成与置信度标注 | 🔴 高 |
-| 多语言输出优化 | 根据输入语言自适应输出 | 🟡 中 |
+| S4 意图识别增强 | 语义理解 + 上下文感知 | 🟡 中 |
+| S7 PostgreSQL 长期存储 | 会话数据持久化到数据库 | 🟡 中 |
 | S3 Rule Candidate 审核流程 | 候选规则提交、审核、启用机制 | 🟡 中 |
 | R4 工具/耗材推荐模板建立 | 从历史数据统计归纳，注入 context | 🟢 低 |
 
@@ -1097,17 +1294,18 @@ S3 LearningFlywheelSkill 自动触发
 
 | 任务 | 说明 | 优先级 |
 |------|------|--------|
-| S7 QueryEmployeeCapabilitySkill 接入 | 待员工能力数据可获取后接入 | 🟢 低 |
+| S7' QueryEmployeeCapabilitySkill 接入 | 待员工能力数据可获取后接入 | 🟢 低 |
 | S2 人数推理增强升级 | 接入真实员工能力数据与更强约束 | 🟢 低 |
 | S3 偏好学习增强 | 学习不同业务/角色的报告结构与表达偏好 | 🟢 低 |
 | 工时模型增强 | 升级为更稳健的统计 / 分位数模型 | 🟢 低 |
 | 模型持续优化 | 基于积累的差异数据优化规则与经验库 | 🟢 低 |
+| S7 多 Redis 实例支持 | 主从/集群部署 | 🟢 低 |
 
 ---
 
 ## 十四、待确认事项
 
-### ✅ 已确认事项（2026-03-25 更新）
+### ✅ 已确认事项（2026-03-26 更新）
 
 | 编号 | 问题 | 确认结论 | 日期 |
 |------|------|---------|------|
@@ -1118,6 +1316,9 @@ S3 LearningFlywheelSkill 自动触发
 | 5 | LearningFlywheelSkill 边界 | ✅ 不直接修改当前结论，只服务未来优化 | 2026-03-25 |
 | 6 | S3 生效机制 | ✅ 候选资产审核后生效 | 2026-03-25 |
 | 7 | S3 触发方式 | ✅ 终稿确认后后台自动触发 | 2026-03-25 |
+| 8 | S4 编号与定位 | ✅ S4 独立为 DialogIntentDetector（v1.1.0） | 2026-03-26 |
+| 9 | S7 编号与定位 | ✅ S7 优先实现为 ReviewPersistenceSkill（v2.0.0） | 2026-03-26 |
+| 10 | 状态持久化方案 | ✅ 使用 Redis（TTL 1 小时）+ PostgreSQL（长期存储） | 2026-03-26 |
 
 ### 📅 待确认事项
 
@@ -1131,10 +1332,43 @@ S3 LearningFlywheelSkill 自动触发
 | 6 | 航修判断的具体条件 | 🟢 低 | 影响风险规则 |
 | 7 | 风险等级的定义 | 🟢 低 | 影响 R3 规则库 |
 | 8 | R4 升级时机 | 🟢 低 | 决定 R4 何时升级为 Skill |
+| 9 | Agent 编排策略优化 | 🟡 中 | 影响 assess() 性能和错误处理 |
 
 ---
 
 ## 文档变更说明
+
+### 2026-03-26 更新
+
+本次版本新增 **S4 DialogIntentDetector** 和 **S7 ReviewPersistenceSkill** 的完整设计，核心变更包括：
+
+1. **新增 S4 详细设计**：
+   - 4 种意图类型定义（MODIFY / READY_TO_CONFIRM / CONFIRM / CANCEL）
+   - 3 状态状态机设计
+   - 二次确认机制
+   - Redis 持久化（v1.1.0+）
+   - 详见《S4 - DialogIntentDetector 详细设计》
+
+2. **新增 S7 详细设计**：
+   - Phase 1-5 完整能力设计
+   - Redis 数据结构设计
+   - 分布式锁实现
+   - Agent 启动自动恢复
+   - 用户首次对话主动通知
+   - 详见《S7 - ReviewPersistenceSkill 详细设计》
+
+3. **编号调整说明**：
+   - S4 原计划整合进 S2，实际独立为对话意图检测器
+   - S7 原计划为 QueryEmployeeCapabilitySkill，实际优先实现为 ReviewPersistenceSkill
+   - QueryEmployeeCapabilitySkill 调整到第三期
+
+4. **MVP 进度更新**：
+   - 完成度：10/11 = 91%
+   - S4 v1.1.0 完成
+   - S7 v2.0.0 完成
+   - S6 联调待实施
+
+---
 
 ### 2026-03-25 更新
 
@@ -1212,6 +1446,14 @@ S3 LearningFlywheelSkill 自动触发
 ---
 
 **文档维护者**: AI Assistant  
-**最后更新**: 2026-03-25  
+**最后更新**: 2026-03-26  
 **补充文档**: 详见《规划方案 - 补充说明 2026-03-24.md》  
-**下次评审**: 2026-03-31（S6 / S3 方案评审后更新）
+**相关设计文档**:
+- 《S1 - SearchHistoryCasesSkill 详细设计》
+- 《S2 - AssessmentReasoningSkill 详细设计》
+- 《S3 - LearningFlywheelSkill 详细设计》
+- 《S4 - DialogIntentDetector 详细设计》
+- 《S5 - ParseRequirementSkill 详细设计》
+- 《S6 - GenerateReportSkill 详细设计》
+- 《S7 - ReviewPersistenceSkill 详细设计》
+**下次评审**: 2026-04-07（主接口 assess() 联调后更新）
